@@ -1,5 +1,6 @@
 package com.ratel.shop.controller.admin;
 
+import cn.hutool.core.util.StrUtil;
 import com.ratel.shop.common.Constants;
 import com.ratel.shop.common.ServiceResultEnum;
 import com.ratel.shop.common.ShopCategoryLevelEnum;
@@ -10,6 +11,7 @@ import com.ratel.shop.service.ShopGoodsService;
 import com.ratel.shop.util.PageQueryUtil;
 import com.ratel.shop.util.Result;
 import com.ratel.shop.util.ResultGenerator;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -23,20 +25,37 @@ import java.util.Map;
 import java.util.Objects;
 
 @Controller
+@Slf4j
 public class ShopGoodsController {
 
     @Resource
-    private ShopGoodsService newBeeMallGoodsService;
+    private ShopGoodsService shopGoodsService;
 
     @Resource
     private ShopCategoryService shopCategoryService;
 
     @GetMapping("/goods")
     public String goodsPage(HttpServletRequest request) {
-        request.setAttribute("path", "newbee_mall_goods");
-        return "admin/newbee_mall_goods";
+        request.setAttribute("path", "shop_goods");
+        return "admin/shop_goods";
     }
 
+    /**
+     * 商品列表
+     */
+    @RequestMapping(value = "/goods/list", method = RequestMethod.GET)
+    @ResponseBody
+    public Result list(@RequestParam Map<String, Object> params) {
+        if (params.get("page") == null || params.get("limit") == null) {
+            return ResultGenerator.genFailResult("参数异常！");
+        }
+        PageQueryUtil pageQueryUtil = new PageQueryUtil(params);
+        return ResultGenerator.genSuccessResult(shopGoodsService.queryRatelShopGoodsPageList(pageQueryUtil));
+    }
+
+    /**
+     * 商品分类查询
+     */
     @GetMapping("/goods/edit")
     public String edit(HttpServletRequest request) {
         request.setAttribute("path", "edit");
@@ -44,12 +63,12 @@ public class ShopGoodsController {
         List<GoodsCategory> firstLevelCategories = shopCategoryService.queryShopCategoryLevelByParentId(Collections.singletonList(0L),
                 ShopCategoryLevelEnum.LEVEL_ONE.getLevel());
         if (!CollectionUtils.isEmpty(firstLevelCategories)) {
-            //查询一级分类列表中第一个实体的所有二级分类
-            List<GoodsCategory> secondLevelCategories = shopCategoryService.queryShopCategoryLevelByParentId(Collections.singletonList(firstLevelCategories.get(0).getId()),
+            // 查询一级分类列表中第一个实体的所有二级分类
+            List<GoodsCategory> secondLevelCategories = shopCategoryService.queryShopCategoryLevelByParentId(Collections.singletonList(firstLevelCategories.get(0).getCategoryId()),
                     ShopCategoryLevelEnum.LEVEL_TWO.getLevel());
             if (!CollectionUtils.isEmpty(secondLevelCategories)) {
-                //查询二级分类列表中第一个实体的所有三级分类
-                List<GoodsCategory> thirdLevelCategories = shopCategoryService.queryShopCategoryLevelByParentId(Collections.singletonList(secondLevelCategories.get(0).getId()),
+                // 查询二级分类列表中第一个实体的所有三级分类
+                List<GoodsCategory> thirdLevelCategories = shopCategoryService.queryShopCategoryLevelByParentId(Collections.singletonList(secondLevelCategories.get(0).getCategoryId()),
                         ShopCategoryLevelEnum.LEVEL_THREE.getLevel());
                 request.setAttribute("firstLevelCategories", firstLevelCategories);
                 request.setAttribute("secondLevelCategories", secondLevelCategories);
@@ -61,10 +80,36 @@ public class ShopGoodsController {
         return "error/error_5xx";
     }
 
+    /**
+     * 商品新增
+     */
+    @RequestMapping(value = "/goods/save", method = RequestMethod.POST)
+    @ResponseBody
+    public Result save(@RequestBody ShopGoods shopGoods) {
+        if (StrUtil.isBlank(shopGoods.getGoodsName())
+                || StrUtil.isBlank(shopGoods.getGoodsIntro())
+                || StrUtil.isBlank(shopGoods.getTag())
+                || Objects.isNull(shopGoods.getOriginalPrice())
+                || Objects.isNull(shopGoods.getGoodsCategoryId())
+                || Objects.isNull(shopGoods.getSellingPrice())
+                || Objects.isNull(shopGoods.getStockNum())
+                || Objects.isNull(shopGoods.getGoodsSellStatus())
+                || StrUtil.isBlank(shopGoods.getGoodsCoverImg())
+                || StrUtil.isBlank(shopGoods.getGoodsDetailContent())) {
+            return ResultGenerator.genFailResult("参数异常！");
+        }
+        String result = shopGoodsService.insertRatelShopGoods(shopGoods);
+        if (ServiceResultEnum.SUCCESS.getResult().equals(result)) {
+            return ResultGenerator.genSuccessResult();
+        } else {
+            return ResultGenerator.genFailResult(result);
+        }
+    }
+
     @GetMapping("/goods/edit/{goodsId}")
     public String edit(HttpServletRequest request, @PathVariable("goodsId") Long goodsId) {
         request.setAttribute("path", "edit");
-        ShopGoods newBeeMallGoods = newBeeMallGoodsService.getNewBeeMallGoodsById(goodsId);
+        ShopGoods newBeeMallGoods = shopGoodsService.getNewBeeMallGoodsById(goodsId);
         if (newBeeMallGoods == null) {
             return "error/error_400";
         }
@@ -118,45 +163,6 @@ public class ShopGoodsController {
         return "admin/newbee_mall_goods_edit";
     }
 
-    /**
-     * 列表
-     */
-    @RequestMapping(value = "/goods/list", method = RequestMethod.GET)
-    @ResponseBody
-    public Result list(@RequestParam Map<String, Object> params) {
-        if (StringUtils.isEmpty(params.get("page")) || StringUtils.isEmpty(params.get("limit"))) {
-            return ResultGenerator.genFailResult("参数异常！");
-        }
-        PageQueryUtil pageUtil = new PageQueryUtil(params);
-        return ResultGenerator.genSuccessResult(newBeeMallGoodsService.getNewBeeMallGoodsPage(pageUtil));
-    }
-
-    /**
-     * 添加
-     */
-    @RequestMapping(value = "/goods/save", method = RequestMethod.POST)
-    @ResponseBody
-    public Result save(@RequestBody ShopGoods newBeeMallGoods) {
-        if (StringUtils.isEmpty(newBeeMallGoods.getGoodsName())
-                || StringUtils.isEmpty(newBeeMallGoods.getGoodsIntro())
-                || StringUtils.isEmpty(newBeeMallGoods.getTag())
-                || Objects.isNull(newBeeMallGoods.getOriginalPrice())
-                || Objects.isNull(newBeeMallGoods.getGoodsCategoryId())
-                || Objects.isNull(newBeeMallGoods.getSellingPrice())
-                || Objects.isNull(newBeeMallGoods.getStockNum())
-                || Objects.isNull(newBeeMallGoods.getGoodsSellStatus())
-                || StringUtils.isEmpty(newBeeMallGoods.getGoodsCoverImg())
-                || StringUtils.isEmpty(newBeeMallGoods.getGoodsDetailContent())) {
-            return ResultGenerator.genFailResult("参数异常！");
-        }
-        String result = newBeeMallGoodsService.saveNewBeeMallGoods(newBeeMallGoods);
-        if (ServiceResultEnum.SUCCESS.getResult().equals(result)) {
-            return ResultGenerator.genSuccessResult();
-        } else {
-            return ResultGenerator.genFailResult(result);
-        }
-    }
-
 
     /**
      * 修改
@@ -177,7 +183,7 @@ public class ShopGoodsController {
                 || StringUtils.isEmpty(newBeeMallGoods.getGoodsDetailContent())) {
             return ResultGenerator.genFailResult("参数异常！");
         }
-        String result = newBeeMallGoodsService.updateNewBeeMallGoods(newBeeMallGoods);
+        String result = shopGoodsService.updateNewBeeMallGoods(newBeeMallGoods);
         if (ServiceResultEnum.SUCCESS.getResult().equals(result)) {
             return ResultGenerator.genSuccessResult();
         } else {
@@ -191,7 +197,7 @@ public class ShopGoodsController {
     @GetMapping("/goods/info/{id}")
     @ResponseBody
     public Result info(@PathVariable("id") Long id) {
-        ShopGoods goods = newBeeMallGoodsService.getNewBeeMallGoodsById(id);
+        ShopGoods goods = shopGoodsService.getNewBeeMallGoodsById(id);
         if (goods == null) {
             return ResultGenerator.genFailResult(ServiceResultEnum.DATA_NOT_EXIST.getResult());
         }
@@ -210,7 +216,7 @@ public class ShopGoodsController {
         if (sellStatus != Constants.SELL_STATUS_UP && sellStatus != Constants.SELL_STATUS_DOWN) {
             return ResultGenerator.genFailResult("状态异常！");
         }
-        if (newBeeMallGoodsService.batchUpdateSellStatus(ids, sellStatus)) {
+        if (shopGoodsService.batchUpdateSellStatus(ids, sellStatus)) {
             return ResultGenerator.genSuccessResult();
         } else {
             return ResultGenerator.genFailResult("修改失败");

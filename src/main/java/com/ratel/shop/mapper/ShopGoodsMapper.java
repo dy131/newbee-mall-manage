@@ -9,11 +9,10 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface ShopGoodsMapper extends BaseMapper<ShopGoods> {
+
+    List<ShopGoods> queryRatelShopGoodsPageList(PageQueryUtil pageQueryUtil);
+
     int deleteByPrimaryKey(Long goodsId);
-
-    int insert(ShopGoods record);
-
-    int insertSelective(ShopGoods record);
 
     ShopGoods selectByPrimaryKey(Long goodsId);
 
@@ -22,8 +21,6 @@ public interface ShopGoodsMapper extends BaseMapper<ShopGoods> {
     int updateByPrimaryKeyWithBLOBs(ShopGoods record);
 
     int updateByPrimaryKey(ShopGoods record);
-
-    List<ShopGoods> findNewBeeMallGoodsList(PageQueryUtil pageUtil);
 
     int getTotalNewBeeMallGoods(PageQueryUtil pageUtil);
 

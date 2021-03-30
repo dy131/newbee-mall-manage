@@ -1,12 +1,16 @@
 package com.ratel.shop.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
 @TableName("t_shop_goods")
+@NoArgsConstructor
+@AllArgsConstructor
 public class ShopGoods extends BaseEntity {
 
     private Long goodsId;
@@ -29,7 +33,7 @@ public class ShopGoods extends BaseEntity {
 
     private String tag;
 
-    private Byte goodsSellStatus;
+    private Integer goodsSellStatus;
 
     private String goodsDetailContent;
 }

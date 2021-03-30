@@ -1,6 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ratel.shop.mapper.ShopGoodsMapper">
+
+    <sql id="Base_Column_List">
+        id,goods_id, goods_name, goods_intro,goods_category_id, goods_cover_img, goods_carousel, original_price,
+        selling_price, stock_num, tag, goods_sell_status, create_user, create_time, update_user,
+        update_time
+    </sql>
+
+    <select id="queryRatelShopGoodsPageList" parameterType="Map" resultType="com.ratel.shop.entity.ShopGoods">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_shop_goods
+        <where>
+            <if test="goodsName!=null and goodsName!=''">
+                AND goods_name LIKE CONCAT('%','#{goodsName}','%')
+            </if>
+            <if test="goodsSellStatus!=null and goodsSellStatus!=''">
+                AND goods_sell_status = #{goodsSellStatus}
+            </if>
+            <if test="startTime != null and startTime.trim() != ''">
+                AND create_time &gt; #{startTime}
+            </if>
+            <if test="endTime != null and endTime.trim() != ''">
+                AND create_time &lt; #{endTime}
+            </if>
+        </where>
+        ORDER BY goods_id DESC
+        <if test="start!=null and limit!=null">
+            LIMIT #{start},#{limit}
+        </if>
+    </select>
+
+
     <resultMap id="BaseResultMap" type="com.ratel.shop.entity.ShopGoods">
         <id column="goods_id" jdbcType="BIGINT" property="goodsId"/>
         <result column="goods_name" jdbcType="VARCHAR" property="goodsName"/>
@@ -18,14 +50,12 @@
         <result column="update_user" jdbcType="INTEGER" property="updateUser"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
+
     <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.ratel.shop.entity.ShopGoods">
         <result column="goods_detail_content" jdbcType="LONGVARCHAR" property="goodsDetailContent"/>
     </resultMap>
-    <sql id="Base_Column_List">
-    goods_id, goods_name, goods_intro,goods_category_id, goods_cover_img, goods_carousel, original_price,
-    selling_price, stock_num, tag, goods_sell_status, create_user, create_time, update_user, 
-    update_time
-  </sql>
+
+
     <sql id="Blob_Column_List">
     goods_detail_content
   </sql>
@@ -61,29 +91,7 @@
             #{id}
         </foreach>
     </update>
-    <select id="findNewBeeMallGoodsList" parameterType="Map" resultMap="BaseResultMap">
-        select
-        <include refid="Base_Column_List"/>
-        from tb_newbee_mall_goods_info
-        <where>
-            <if test="goodsName!=null and goodsName!=''">
-                and goods_name like CONCAT('%','#{goodsName}','%')
-            </if>
-            <if test="goodsSellStatus!=null and goodsSellStatus!=''">
-                and goods_sell_status = #{goodsSellStatus}
-            </if>
-            <if test="startTime != null and startTime.trim() != ''">
-                and create_time &gt; #{startTime}
-            </if>
-            <if test="endTime != null and endTime.trim() != ''">
-                and create_time &lt; #{endTime}
-            </if>
-        </where>
-        order by goods_id desc
-        <if test="start!=null and limit!=null">
-            limit #{start},#{limit}
-        </if>
-    </select>
+
 
     <select id="findNewBeeMallGoodsListBySearch" parameterType="Map" resultMap="BaseResultMap">
         select
@@ -162,126 +170,9 @@
         </where>
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-    delete from tb_newbee_mall_goods_info
-    where goods_id = #{goodsId,jdbcType=BIGINT}
-  </delete>
-    <insert id="insert" parameterType="com.ratel.shop.entity.ShopGoods">
-    insert into tb_newbee_mall_goods_info (goods_id, goods_name, goods_intro, 
-      goods_cover_img, goods_carousel, original_price, 
-      selling_price, stock_num, tag, 
-      goods_sell_status, create_user, create_time, 
-      update_user, update_time, goods_detail_content
-      )
-    values (#{goodsId,jdbcType=BIGINT}, #{goodsName,jdbcType=VARCHAR}, #{goodsIntro,jdbcType=VARCHAR}, 
-      #{goodsCoverImg,jdbcType=VARCHAR}, #{goodsCarousel,jdbcType=VARCHAR}, #{originalPrice,jdbcType=INTEGER}, 
-      #{sellingPrice,jdbcType=INTEGER}, #{stockNum,jdbcType=INTEGER}, #{tag,jdbcType=VARCHAR}, 
-      #{goodsSellStatus,jdbcType=TINYINT}, #{createUser,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateUser,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, #{goodsDetailContent,jdbcType=LONGVARCHAR}
-      )
-  </insert>
-    <insert id="insertSelective" parameterType="com.ratel.shop.entity.ShopGoods">
-        insert into tb_newbee_mall_goods_info
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="goodsId != null">
-                goods_id,
-            </if>
-            <if test="goodsName != null">
-                goods_name,
-            </if>
-            <if test="goodsIntro != null">
-                goods_intro,
-            </if>
-            <if test="goodsCategoryId != null">
-                goods_category_id,
-            </if>
-            <if test="goodsCoverImg != null">
-                goods_cover_img,
-            </if>
-            <if test="goodsCarousel != null">
-                goods_carousel,
-            </if>
-            <if test="originalPrice != null">
-                original_price,
-            </if>
-            <if test="sellingPrice != null">
-                selling_price,
-            </if>
-            <if test="stockNum != null">
-                stock_num,
-            </if>
-            <if test="tag != null">
-                tag,
-            </if>
-            <if test="goodsSellStatus != null">
-                goods_sell_status,
-            </if>
-            <if test="createUser != null">
-                create_user,
-            </if>
-            <if test="createTime != null">
-                create_time,
-            </if>
-            <if test="updateUser != null">
-                update_user,
-            </if>
-            <if test="updateTime != null">
-                update_time,
-            </if>
-            <if test="goodsDetailContent != null">
-                goods_detail_content,
-            </if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="goodsId != null">
-                #{goodsId,jdbcType=BIGINT},
-            </if>
-            <if test="goodsName != null">
-                #{goodsName,jdbcType=VARCHAR},
-            </if>
-            <if test="goodsIntro != null">
-                #{goodsIntro,jdbcType=VARCHAR},
-            </if>
-            <if test="goodsIntro != null">
-                #{goodsCategoryId,jdbcType=BIGINT},
-            </if>
-            <if test="goodsCoverImg != null">
-                #{goodsCoverImg,jdbcType=VARCHAR},
-            </if>
-            <if test="goodsCarousel != null">
-                #{goodsCarousel,jdbcType=VARCHAR},
-            </if>
-            <if test="originalPrice != null">
-                #{originalPrice,jdbcType=INTEGER},
-            </if>
-            <if test="sellingPrice != null">
-                #{sellingPrice,jdbcType=INTEGER},
-            </if>
-            <if test="stockNum != null">
-                #{stockNum,jdbcType=INTEGER},
-            </if>
-            <if test="tag != null">
-                #{tag,jdbcType=VARCHAR},
-            </if>
-            <if test="goodsSellStatus != null">
-                #{goodsSellStatus,jdbcType=TINYINT},
-            </if>
-            <if test="createUser != null">
-                #{createUser,jdbcType=INTEGER},
-            </if>
-            <if test="createTime != null">
-                #{createTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="updateUser != null">
-                #{updateUser,jdbcType=INTEGER},
-            </if>
-            <if test="updateTime != null">
-                #{updateTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="goodsDetailContent != null">
-                #{goodsDetailContent,jdbcType=LONGVARCHAR},
-            </if>
-        </trim>
-    </insert>
+        delete from tb_newbee_mall_goods_info
+        where goods_id = #{goodsId,jdbcType=BIGINT}
+      </delete>
     <update id="updateByPrimaryKeySelective" parameterType="com.ratel.shop.entity.ShopGoods">
         update tb_newbee_mall_goods_info
         <set>

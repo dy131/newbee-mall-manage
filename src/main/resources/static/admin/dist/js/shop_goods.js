@@ -1,6 +1,6 @@
 $(function () {
     $("#jqGrid").jqGrid({
-        url: '/admin/goods/list',
+        url: '/goods/list',
         datatype: "json",
         colModel: [
             {label: '商品编号', name: 'goodsId', index: 'goodsId', width: 60, key: true},
@@ -80,7 +80,8 @@ function reload() {
  * 添加商品
  */
 function addGoods() {
-    window.location.href = "/admin/goods/edit";
+    alert('添加商品')
+    window.location.href = "/goods/edit";
 }
 
 /**

@@ -8,28 +8,17 @@
  */
 package com.ratel.shop.service;
 
+import com.ratel.shop.entity.ShopGoods;
 import com.ratel.shop.util.PageQueryUtil;
 import com.ratel.shop.util.PageResult;
-import com.ratel.shop.entity.ShopGoods;
 
 import java.util.List;
 
 public interface ShopGoodsService {
-    /**
-     * 后台分页
-     *
-     * @param pageUtil
-     * @return
-     */
-    PageResult getNewBeeMallGoodsPage(PageQueryUtil pageUtil);
 
-    /**
-     * 添加商品
-     *
-     * @param goods
-     * @return
-     */
-    String saveNewBeeMallGoods(ShopGoods goods);
+    PageResult queryRatelShopGoodsPageList(PageQueryUtil pageQueryUtil);
+
+    String insertRatelShopGoods(ShopGoods shopGoods);
 
     /**
      * 批量新增商品数据
@@ -61,6 +50,6 @@ public interface ShopGoodsService {
      * @param ids
      * @return
      */
-    Boolean batchUpdateSellStatus(Long[] ids,int sellStatus);
+    Boolean batchUpdateSellStatus(Long[] ids, int sellStatus);
 
 }

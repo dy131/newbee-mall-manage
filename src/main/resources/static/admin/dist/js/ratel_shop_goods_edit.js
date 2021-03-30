@@ -184,7 +184,7 @@ $('#saveButton').click(function () {
     }
     console.log(data);
     $.ajax({
-        type: 'POST',//方法类型
+        type: 'POST',
         url: url,
         contentType: 'application/json',
         data: JSON.stringify(data),
