@@ -1,33 +1,27 @@
-<!-- Copyright (c) 2019-2020 十三 all rights reserved. -->
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <aside th:fragment="sidebar-fragment(path)" class="main-sidebar sidebar-dark-primary elevation-4">
-    <!-- Brand Logo -->
     <a th:href="@{/admin/index}" class="brand-link">
         <img th:src="@{/admin/dist/img/new-bee-logo-1.png}" alt="ssm-cluster Logo"
              class="brand-image img-circle elevation-3"
              style="opacity: .8">
-        <span class="brand-text font-weight-light">NEWBEE商城</span>
+        <span class="brand-text font-weight-light">Ratel商城</span>
     </a>
-    <!-- Sidebar -->
     <div class="sidebar">
-        <!-- Sidebar Menu -->
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                 data-accordion="false">
-                <!-- Add icons to the links using the .nav-icon class
-                     with font-awesome or any other icon font library -->
-                <li class="nav-header">Dashboard</li>
+                <li class="nav-header">控制菜单</li>
                 <li class="nav-item">
-                    <a th:href="@{/admin/index}" th:class="${path}=='index'?'nav-link active':'nav-link'">
+                    <a th:href="@{/index}" th:class="${path}=='index'?'nav-link active':'nav-link'">
                         <i class="nav-icon fa fa-dashboard"></i>
                         <p>
-                            Dashboard
+                            面板
                         </p>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a th:href="@{/admin/goods/edit}" th:class="${path}=='goods-edit'?'nav-link active':'nav-link'">
+                    <a th:href="@{/goods/edit}" th:class="${path}=='goods-edit'?'nav-link active':'nav-link'">
                         <i class="nav-icon fa fa-plus"></i>
                         <p>
                             商品信息
@@ -36,7 +30,7 @@
                 </li>
                 <li class="nav-header">首页配置</li>
                 <li class="nav-item">
-                    <a th:href="@{/admin/carousels}"
+                    <a th:href="@{/carousels}"
                        th:class="${path}=='newbee_mall_carousel'?'nav-link active':'nav-link'">
                         <i class="nav-icon fa fa-file-image-o"></i>
                         <p>
@@ -45,7 +39,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a th:href="@{/admin/indexConfigs?configType=3}"
+                    <a th:href="@{/indexConfigs?configType=3}"
                        th:class="${path}=='INDEX_GOODS_HOTS'?'nav-link active':'nav-link'">
                         <i class="nav-icon fa fa-hand-o-up"></i>
                         <p>
@@ -54,7 +48,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a th:href="@{/admin/indexConfigs?configType=4}"
+                    <a th:href="@{/indexConfigs?configType=4}"
                        th:class="${path}=='INDEX_GOODS_NEW'?'nav-link active':'nav-link'">
                         <i class="nav-icon fa fa-hand-o-up"></i>
                         <p>
@@ -63,7 +57,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a th:href="@{/admin/indexConfigs?configType=5}"
+                    <a th:href="@{/indexConfigs?configType=5}"
                        th:class="${path}=='INDEX_GOODS_RECOMMOND'?'nav-link active':'nav-link'">
                         <i class="nav-icon fa fa-hand-o-up"></i>
                         <p>
@@ -73,7 +67,7 @@
                 </li>
                 <li class="nav-header">管理模块</li>
                 <li class="nav-item">
-                    <a th:href="@{/admin/categories?parentId=0&categoryLevel=1&backParentId=0}"
+                    <a th:href="@{/categories?parentId=0&categoryLevel=1&backParentId=0}"
                        th:class="${path}=='newbee_mall_category'?'nav-link active':'nav-link'">
                         <i class="fa fa-list-alt nav-icon" aria-hidden="true"></i>
                         <p>
@@ -82,7 +76,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a th:href="@{/admin/goods}" th:class="${path}=='newbee_mall_goods'?'nav-link active':'nav-link'">
+                    <a th:href="@{/goods}" th:class="${path}=='newbee_mall_goods'?'nav-link active':'nav-link'">
                         <i class="fa fa-archive nav-icon" aria-hidden="true"></i>
                         <p>
                             商品管理
@@ -90,7 +84,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a th:href="@{/admin/users}" th:class="${path}=='users'?'nav-link active':'nav-link'">
+                    <a th:href="@{/users}" th:class="${path}=='users'?'nav-link active':'nav-link'">
                         <i class="fa fa-users nav-icon" aria-hidden="true"></i>
                         <p>
                             会员管理
@@ -98,7 +92,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a th:href="@{/admin/orders}" th:class="${path}=='orders'?'nav-link active':'nav-link'">
+                    <a th:href="@{/orders}" th:class="${path}=='orders'?'nav-link active':'nav-link'">
                         <i class="fa fa-money nav-icon" aria-hidden="true"></i>
                         <p>
                             订单管理
@@ -107,14 +101,14 @@
                 </li>
                 <li class="nav-header">系统管理</li>
                 <li class="nav-item">
-                    <a th:href="@{/admin/profile}"
+                    <a th:href="@{/profile}"
                        th:class="${path}=='profile'?'nav-link active':'nav-link'">
                         <i class="fa fa-user-secret nav-icon"></i>
                         <p>修改密码</p>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a th:href="@{/admin/logout}" class="nav-link">
+                    <a th:href="@{/logout}" class="nav-link">
                         <i class="fa fa-sign-out nav-icon"></i>
                         <p>安全退出</p>
                     </a>
@@ -122,8 +116,6 @@
                 </li>
             </ul>
         </nav>
-        <!-- /.sidebar-menu -->
     </div>
-    <!-- /.sidebar -->
 </aside>
 </html>
