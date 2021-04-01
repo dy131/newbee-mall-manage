@@ -1,11 +1,10 @@
 package com.ratel.shop.controller.admin;
 
+import com.ratel.shop.service.ShopUserService;
 import com.ratel.shop.util.PageQueryUtil;
 import com.ratel.shop.util.Result;
 import com.ratel.shop.util.ResultGenerator;
-import com.ratel.shop.service.ShopUserService;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -14,29 +13,25 @@ import java.util.Map;
 
 
 @Controller
-@RequestMapping("/admin")
 public class ShopUserController {
 
     @Resource
-    private ShopUserService newBeeMallUserService;
+    private ShopUserService shopUserService;
 
     @GetMapping("/users")
     public String usersPage(HttpServletRequest request) {
         request.setAttribute("path", "users");
-        return "admin/newbee_mall_user";
+        return "admin/shop_user";
     }
 
-    /**
-     * 列表
-     */
     @RequestMapping(value = "/users/list", method = RequestMethod.GET)
     @ResponseBody
     public Result list(@RequestParam Map<String, Object> params) {
-        if (StringUtils.isEmpty(params.get("page")) || StringUtils.isEmpty(params.get("limit"))) {
+        if (params.get("page") == null || params.get("limit") == null) {
             return ResultGenerator.genFailResult("参数异常！");
         }
-        PageQueryUtil pageUtil = new PageQueryUtil(params);
-        return ResultGenerator.genSuccessResult(newBeeMallUserService.getNewBeeMallUsersPage(pageUtil));
+        PageQueryUtil pageQueryUtil = new PageQueryUtil(params);
+        return ResultGenerator.genSuccessResult(shopUserService.queryShopUserPageList(pageQueryUtil));
     }
 
     /**
@@ -44,14 +39,14 @@ public class ShopUserController {
      */
     @RequestMapping(value = "/users/lock/{lockStatus}", method = RequestMethod.POST)
     @ResponseBody
-    public Result delete(@RequestBody Integer[] ids, @PathVariable int lockStatus) {
-        if (ids.length < 1) {
+    public Result delete(@RequestBody Integer[] userIds, @PathVariable int lockStatus) {
+        if (userIds.length < 1) {
             return ResultGenerator.genFailResult("参数异常！");
         }
         if (lockStatus != 0 && lockStatus != 1) {
             return ResultGenerator.genFailResult("操作非法！");
         }
-        if (newBeeMallUserService.lockUsers(ids, lockStatus)) {
+        if (shopUserService.lockUsers(userIds, lockStatus)) {
             return ResultGenerator.genSuccessResult();
         } else {
             return ResultGenerator.genFailResult("禁用失败");

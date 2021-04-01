@@ -7,19 +7,15 @@ import com.ratel.shop.util.PageResult;
 import java.util.List;
 
 public interface ShopCategoryService {
-    /**
-     * 后台分页
-     *
-     * @param pageUtil
-     * @return
-     */
-    PageResult getCategorisPage(PageQueryUtil pageUtil);
 
-    String saveCategory(GoodsCategory goodsCategory);
+    PageResult getGoodsCategoryPageList(PageQueryUtil pageQueryUtil);
+
+    String insertGoodsCategory(GoodsCategory goodsCategory);
 
     String updateGoodsCategory(GoodsCategory goodsCategory);
 
-    GoodsCategory getGoodsCategoryById(Long id);
+    GoodsCategory queryGoodsCategoryById(Long categoryId);
+
 
     Boolean deleteBatch(Integer[] ids);
 

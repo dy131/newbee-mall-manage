@@ -1,14 +1,17 @@
 package com.ratel.shop.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
 @Builder
 @TableName("t_shop_order")
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class ShopOrder extends BaseEntity{
 
     private Long orderId;
@@ -17,17 +20,17 @@ public class ShopOrder extends BaseEntity{
 
     private Long userId;
 
-    private Integer totalPrice;
+    private BigDecimal totalPrice;
 
-    private Byte payStatus;
+    private Integer payStatus;
 
-    private Byte payType;
+    private Integer payType;
 
     private Date payTime;
 
-    private Byte orderStatus;
+    private Integer orderStatus;
 
     private String extraInfo;
 
-    private Byte isDeleted;
+    private Integer isDeleted;
 }

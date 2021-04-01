@@ -1,6 +1,107 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ratel.shop.mapper.ShopOrderMapper">
+    <sql id="Base_Column_List">
+        id, order_id, order_no, user_id, total_price, pay_status, pay_type, pay_time, order_status,
+        extra_info, is_deleted, create_time, update_time
+     </sql>
+    <select id="queryShopOrderPageList" parameterType="Map" resultType="com.ratel.shop.entity.ShopOrder">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_shop_order
+        <where>
+            <if test="orderNo!=null and orderNo!=''">
+                AND order_no = #{orderNo}
+            </if>
+            <if test="userId!=null and userId!=''">
+                AND user_id = #{userId}
+            </if>
+            <if test="payType!=null and payType!=''">
+                AND pay_type = #{payType}
+            </if>
+            <if test="orderStatus!=null">
+                AND order_status = #{orderStatus}
+            </if>
+            <if test="isDeleted!=null and isDeleted!=''">
+                AND is_deleted = #{isDeleted}
+            </if>
+            <if test="startTime != null and startTime.trim() != ''">
+                AND create_time &gt; #{startTime}
+            </if>
+            <if test="endTime != null and endTime.trim() != ''">
+                AND create_time &lt; #{endTime}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+        <if test="start!=null and limit!=null">
+            LIMIT #{start},#{limit}
+        </if>
+    </select>
+
+    <select id="queryShopOrderPageCount" parameterType="Map" resultType="int">
+        SELECT COUNT(*) FROM t_shop_order
+        <where>
+            <if test="orderNo!=null and orderNo!=''">
+                AND order_no = #{orderNo}
+            </if>
+            <if test="userId!=null and userId!=''">
+                AND user_id = #{userId}
+            </if>
+            <if test="payType!=null and payType!=''">
+                AND pay_type = #{payType}
+            </if>
+            <if test="orderStatus!=null">
+                AND order_status = #{orderStatus}
+            </if>
+            <if test="isDeleted!=null and isDeleted!=''">
+                AND is_deleted = #{isDeleted}
+            </if>
+            <if test="startTime != null and startTime.trim() != ''">
+                AND create_time &gt; #{startTime}
+            </if>
+            <if test="endTime != null and endTime.trim() != ''">
+                AND create_time &lt; #{endTime}
+            </if>
+        </where>
+    </select>
+
+    <select id="queryShopOrderByOrderIds" resultType="com.ratel.shop.entity.ShopOrder">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_shop_order
+        WHERE order_id IN
+        <foreach collection="orderIds" item="orderId" index="index"
+                 open="(" separator="," close=")">#{orderId}
+        </foreach>
+    </select>
+
+    <update id="updateOrderAllotStatus">
+        UPDATE t_shop_order
+        SET order_status = 2, update_time = now()
+        WHERE order_id IN
+        <foreach collection="orderIds" item="orderId" index="index"
+                 open="(" separator="," close=")">#{orderId}
+        </foreach>
+    </update>
+
+    <update id="updateOrderOutStatus">
+        UPDATE t_shop_order
+        SET order_status = 3,update_time = now()
+        WHERE order_id IN
+        <foreach collection="orderIds" item="orderId" index="index"
+                 open="(" separator="," close=")">#{orderId}
+        </foreach>
+    </update>
+
+    <update id="updateOrderCloseStatus">
+        UPDATE t_shop_order
+        SET order_status = #{orderStatus},update_time = now()
+        WHERE order_id IN
+        <foreach collection="orderIds" item="orderId" index="index"
+                 open="(" separator="," close=")">#{orderId}
+        </foreach>
+    </update>
+
     <resultMap id="BaseResultMap" type="com.ratel.shop.entity.ShopOrder">
         <id column="order_id" jdbcType="BIGINT" property="orderId"/>
         <result column="order_no" jdbcType="VARCHAR" property="orderNo"/>
@@ -15,10 +116,7 @@
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
-    <sql id="Base_Column_List">
-    order_id, order_no, user_id, total_price, pay_status, pay_type, pay_time, order_status,
-    extra_info, is_deleted, create_time, update_time
-  </sql>
+
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
@@ -31,74 +129,8 @@
         from tb_newbee_mall_order
         where order_no = #{orderNo,jdbcType=VARCHAR} and is_deleted=0 limit 1
     </select>
-    <select id="selectByPrimaryKeys" resultMap="BaseResultMap">
-        select
-        <include refid="Base_Column_List"/>
-        from tb_newbee_mall_order
-        where order_id in
-        <foreach collection="orderIds" item="item" index="index"
-                 open="(" separator="," close=")">#{item}
-        </foreach>
-    </select>
-    <select id="findNewBeeMallOrderList" parameterType="Map" resultMap="BaseResultMap">
-        select
-        <include refid="Base_Column_List"/>
-        from tb_newbee_mall_order
-        <where>
-            <if test="orderNo!=null and orderNo!=''">
-                and order_no = #{orderNo}
-            </if>
-            <if test="userId!=null and userId!=''">
-                and user_id = #{userId}
-            </if>
-            <if test="payType!=null and payType!=''">
-                and pay_type = #{payType}
-            </if>
-            <if test="orderStatus!=null">
-                and order_status = #{orderStatus}
-            </if>
-            <if test="isDeleted!=null and isDeleted!=''">
-                and is_deleted = #{isDeleted}
-            </if>
-            <if test="startTime != null and startTime.trim() != ''">
-                and create_time &gt; #{startTime}
-            </if>
-            <if test="endTime != null and endTime.trim() != ''">
-                and create_time &lt; #{endTime}
-            </if>
-        </where>
-        order by create_time desc
-        <if test="start!=null and limit!=null">
-            limit #{start},#{limit}
-        </if>
-    </select>
 
-    <select id="getTotalNewBeeMallOrders" parameterType="Map" resultType="int">
-        select count(*) from tb_newbee_mall_order
-        <where>
-            <if test="orderNo!=null and orderNo!=''">
-                and order_no = #{orderNo}
-            </if>
-            <if test="userId!=null and userId!=''">
-                and user_id = #{userId}
-            </if>
-            <if test="payType!=null and payType!=''">
-                and pay_type = #{payType}
-            </if>
-            <if test="orderStatus!=null">
-                and order_status = #{orderStatus}
-            </if>
-            <if test="isDeleted!=null and isDeleted!=''">
-                and is_deleted = #{isDeleted}
-            </if>
-            <if test="startTime != null and startTime.trim() != ''">
-                and create_time &gt; #{startTime}
-            </if>
-            <if test="endTime != null and endTime.trim() != ''">
-                and create_time &lt; #{endTime}
-            </if>
-        </where>
-    </select>
+
     <update id="deleteByPrimaryKey" parameterType="java.lang.Long">
     update tb_newbee_mall_order set is_deleted=1
     where order_id = #{orderId,jdbcType=BIGINT} and is_deleted=0
@@ -195,30 +227,7 @@
             </if>
         </trim>
     </insert>
-    <update id="checkDone">
-        update tb_newbee_mall_order
-        set order_status = 2,update_time = now()
-        where order_id in
-        <foreach collection="orderIds" item="item" index="index"
-                 open="(" separator="," close=")">#{item}
-        </foreach>
-    </update>
-    <update id="checkOut">
-        update tb_newbee_mall_order
-        set order_status = 3,update_time = now()
-        where order_id in
-        <foreach collection="orderIds" item="item" index="index"
-                 open="(" separator="," close=")">#{item}
-        </foreach>
-    </update>
-    <update id="closeOrder">
-        update tb_newbee_mall_order
-        set order_status = #{orderStatus},update_time = now()
-        where order_id in
-        <foreach collection="orderIds" item="item" index="index"
-                 open="(" separator="," close=")">#{item}
-        </foreach>
-    </update>
+
     <update id="updateByPrimaryKeySelective" parameterType="com.ratel.shop.entity.ShopOrder">
         update tb_newbee_mall_order
         <set>

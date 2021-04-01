@@ -5,14 +5,10 @@ import com.ratel.shop.util.PageResult;
 
 public interface ShopUserService {
 
-    PageResult getNewBeeMallUsersPage(PageQueryUtil pageUtil);
+    PageResult queryShopUserPageList(PageQueryUtil pageQueryUtil);
 
     /**
      * 用户禁用与解除禁用(0-未锁定 1-已锁定)
-     *
-     * @param ids
-     * @param lockStatus
-     * @return
      */
-    Boolean lockUsers(Integer[] ids, int lockStatus);
+    Boolean lockUsers(Integer[] userIds, int lockStatus);
 }

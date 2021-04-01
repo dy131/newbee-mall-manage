@@ -8,6 +8,19 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface ShopOrderMapper extends BaseMapper<ShopOrder> {
+
+    List<ShopOrder> queryShopOrderPageList(PageQueryUtil pageQueryUtil);
+
+    int queryShopOrderPageCount(PageQueryUtil pageQueryUtil);
+
+    List<ShopOrder> queryShopOrderByOrderIds(@Param("orderIds") List<Long> orderIds);
+
+    int updateOrderAllotStatus(@Param("orderIds") List<Long> orderIds);
+
+    int updateOrderOutStatus(@Param("orderIds") List<Long> orderIds);
+
+    int updateOrderCloseStatus(@Param("orderIds") List<Long> orderIds, @Param("orderStatus") int orderStatus);
+
     int deleteByPrimaryKey(Long orderId);
 
     int insert(ShopOrder record);
@@ -22,15 +35,5 @@ public interface ShopOrderMapper extends BaseMapper<ShopOrder> {
 
     int updateByPrimaryKey(ShopOrder record);
 
-    List<ShopOrder> findNewBeeMallOrderList(PageQueryUtil pageUtil);
 
-    int getTotalNewBeeMallOrders(PageQueryUtil pageUtil);
-
-    List<ShopOrder> selectByPrimaryKeys(@Param("orderIds") List<Long> orderIds);
-
-    int checkOut(@Param("orderIds") List<Long> orderIds);
-
-    int closeOrder(@Param("orderIds") List<Long> orderIds, @Param("orderStatus") int orderStatus);
-
-    int checkDone(@Param("orderIds") List<Long> asList);
 }

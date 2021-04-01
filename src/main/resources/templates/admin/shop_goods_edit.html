@@ -24,8 +24,8 @@
                                         data-placeholder="请选择分类...">
                                     <th:block th:unless="${null == firstLevelCategories}">
                                         <th:block th:each="c : ${firstLevelCategories}">
-                                            <option th:value="${c.categoryId}" th:text="${c.categoryName}"
-                                                    th:selected="${null !=firstLevelCategoryId and firstLevelCategoryId==c.categoryId} ?true:false">
+                                            <option th:value="${c.id}" th:text="${c.categoryName}"
+                                                    th:selected="${null !=firstLevelCategoryId and firstLevelCategoryId==c.id} ?true:false">
                                                 >
                                             </option>
                                         </th:block>
@@ -36,8 +36,8 @@
                                         data-placeholder="请选择分类...">
                                     <th:block th:unless="${null == secondLevelCategories}">
                                         <th:block th:each="c : ${secondLevelCategories}">
-                                            <option th:value="${c.categoryId}" th:text="${c.categoryName}"
-                                                    th:selected="${null !=secondLevelCategoryId and secondLevelCategoryId==c.categoryId} ?true:false">
+                                            <option th:value="${c.id}" th:text="${c.categoryName}"
+                                                    th:selected="${null !=secondLevelCategoryId and secondLevelCategoryId==c.id} ?true:false">
                                                 >
                                             </option>
                                         </th:block>
@@ -48,8 +48,8 @@
                                         data-placeholder="请选择分类...">
                                     <th:block th:unless="${null == thirdLevelCategories}">
                                         <th:block th:each="c : ${thirdLevelCategories}">
-                                            <option th:value="${c.categoryId}" th:text="${c.categoryName}"
-                                                    th:selected="${null !=thirdLevelCategoryId and thirdLevelCategoryId==c.categoryId} ?true:false">
+                                            <option th:value="${c.id}" th:text="${c.categoryName}"
+                                                    th:selected="${null !=thirdLevelCategoryId and thirdLevelCategoryId==c.id} ?true:false">
                                                 >
                                             </option>
                                         </th:block>
@@ -57,8 +57,8 @@
                                 </select>
                             </div>
                             <div class="form-group" style="display:flex;">
-                                <input type="hidden" id="goodsId" name="goodsId"
-                                       th:value="${goods!=null and goods.goodsId!=null }?${goods.goodsId}: 0">
+                                <input type="hidden" id="id" name="id"
+                                       th:value="${goods!=null and goods.id!=null }?${goods.id}: 0">
                                 <input type="text" class="form-control col-sm-6" id="goodsName" name="goodsName"
                                        placeholder="*请输入商品名称(必填)"
                                        th:value="${goods!=null and goods.goodsName!=null }?${goods.goodsName}: ''"
@@ -124,9 +124,9 @@
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                                    aria-hidden="true">&times;</span></button>
                             <h6 class="modal-title" id="goodsModalLabel">信息完善</h6>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">X</span></button>
                         </div>
                         <div class="modal-body">
                             <form onsubmit="return false;">
@@ -173,6 +173,6 @@
 <script th:src="@{/admin/plugins/kindeditor-4.1.10/kindeditor-all.js}"></script>
 <script th:src="@{/admin/plugins/kindeditor-4.1.10/lang/zh_CN.js}"></script>
 <script th:src="@{/admin/dist/js/public.js}"></script>
-<script th:src="@{/admin/dist/js/ratel_shop_goods_edit.js}"></script>
+<script th:src="@{/admin/dist/js/shop_goods_edit.js}"></script>
 </body>
 </html>

@@ -1,76 +1,56 @@
-/**
- * 严肃声明：
- * 开源版本请务必保留此注释头信息，若删除我方将保留所有法律责任追究！
- * 本软件已申请软件著作权，受国家版权局知识产权以及国家计算机软件著作权保护！
- * 可正常分享和学习源码，不得用于违法犯罪活动，违者必究！
- * Copyright (c) 2020 十三 all rights reserved.
- * 版权所有，侵权必究！
- */
 package com.ratel.shop.controller.admin;
 
-import com.ratel.shop.util.PageQueryUtil;
-import com.ratel.shop.util.Result;
-import com.ratel.shop.util.ResultGenerator;
 import com.ratel.shop.common.ServiceResultEnum;
 import com.ratel.shop.entity.ShopOrder;
 import com.ratel.shop.entity.ShopOrderItem;
 import com.ratel.shop.service.ShopOrderService;
+import com.ratel.shop.util.PageQueryUtil;
+import com.ratel.shop.util.Result;
+import com.ratel.shop.util.ResultGenerator;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-/**
- * @author 13
- * @qq交流群 796794009
- * @email 2449207463@qq.com
- * @link https://github.com/newbee-ltd
- */
+
 @Controller
-@RequestMapping("/admin")
 public class ShopOrderController {
 
     @Resource
-    private ShopOrderService newBeeMallOrderService;
+    private ShopOrderService shopOrderService;
 
     @GetMapping("/orders")
     public String ordersPage(HttpServletRequest request) {
         request.setAttribute("path", "orders");
-        return "admin/newbee_mall_order";
+        return "admin/shop_order";
     }
 
-    /**
-     * 列表
-     */
     @RequestMapping(value = "/orders/list", method = RequestMethod.GET)
     @ResponseBody
     public Result list(@RequestParam Map<String, Object> params) {
-        if (StringUtils.isEmpty(params.get("page")) || StringUtils.isEmpty(params.get("limit"))) {
+        if (params.get("page") == null || params.get("limit") == null) {
             return ResultGenerator.genFailResult("参数异常！");
         }
-        PageQueryUtil pageUtil = new PageQueryUtil(params);
-        return ResultGenerator.genSuccessResult(newBeeMallOrderService.getNewBeeMallOrdersPage(pageUtil));
+        PageQueryUtil pageQueryUtil = new PageQueryUtil(params);
+        return ResultGenerator.genSuccessResult(shopOrderService.queryShopOrderPageList(pageQueryUtil));
     }
 
-    /**
-     * 修改
-     */
     @RequestMapping(value = "/orders/update", method = RequestMethod.POST)
     @ResponseBody
-    public Result update(@RequestBody ShopOrder newBeeMallOrder) {
-        if (Objects.isNull(newBeeMallOrder.getTotalPrice())
-                || Objects.isNull(newBeeMallOrder.getOrderId())
-                || newBeeMallOrder.getOrderId() < 1
-                || newBeeMallOrder.getTotalPrice() < 1) {
+    public Result update(@RequestBody ShopOrder shopOrder) {
+        if (Objects.isNull(shopOrder.getTotalPrice())
+                || Objects.isNull(shopOrder.getOrderId())
+                || shopOrder.getOrderId() < 1
+                || shopOrder.getTotalPrice().compareTo(BigDecimal.ZERO) < 1) {
             return ResultGenerator.genFailResult("参数异常！");
         }
-        String result = newBeeMallOrderService.updateOrderInfo(newBeeMallOrder);
+        String result = shopOrderService.updateShopOrder(shopOrder);
         if (ServiceResultEnum.SUCCESS.getResult().equals(result)) {
             return ResultGenerator.genSuccessResult();
         } else {
@@ -79,12 +59,12 @@ public class ShopOrderController {
     }
 
     /**
-     * 详情
+     * 订单详情
      */
-    @GetMapping("/order-items/{id}")
+    @GetMapping("/order-items/{orderId}")
     @ResponseBody
-    public Result info(@PathVariable("id") Long id) {
-        List<ShopOrderItem> orderItems = newBeeMallOrderService.getOrderItems(id);
+    public Result info(@PathVariable("orderId") Long orderId) {
+        List<ShopOrderItem> orderItems = shopOrderService.queryOrderDetailByOrderId(orderId);
         if (!CollectionUtils.isEmpty(orderItems)) {
             return ResultGenerator.genSuccessResult(orderItems);
         }
@@ -96,11 +76,11 @@ public class ShopOrderController {
      */
     @RequestMapping(value = "/orders/checkDone", method = RequestMethod.POST)
     @ResponseBody
-    public Result checkDone(@RequestBody Long[] ids) {
-        if (ids.length < 1) {
+    public Result checkDone(@RequestBody Long[] orderIds) {
+        if (orderIds.length < 1) {
             return ResultGenerator.genFailResult("参数异常！");
         }
-        String result = newBeeMallOrderService.checkDone(ids);
+        String result = shopOrderService.updateOrderAllotStatus(orderIds);
         if (ServiceResultEnum.SUCCESS.getResult().equals(result)) {
             return ResultGenerator.genSuccessResult();
         } else {
@@ -113,11 +93,11 @@ public class ShopOrderController {
      */
     @RequestMapping(value = "/orders/checkOut", method = RequestMethod.POST)
     @ResponseBody
-    public Result checkOut(@RequestBody Long[] ids) {
-        if (ids.length < 1) {
+    public Result checkOut(@RequestBody Long[] orderIds) {
+        if (orderIds.length < 1) {
             return ResultGenerator.genFailResult("参数异常！");
         }
-        String result = newBeeMallOrderService.checkOut(ids);
+        String result = shopOrderService.updateOrderOutStatus(orderIds);
         if (ServiceResultEnum.SUCCESS.getResult().equals(result)) {
             return ResultGenerator.genSuccessResult();
         } else {
@@ -130,17 +110,15 @@ public class ShopOrderController {
      */
     @RequestMapping(value = "/orders/close", method = RequestMethod.POST)
     @ResponseBody
-    public Result closeOrder(@RequestBody Long[] ids) {
-        if (ids.length < 1) {
+    public Result closeOrder(@RequestBody Long[] orderIds) {
+        if (orderIds.length < 1) {
             return ResultGenerator.genFailResult("参数异常！");
         }
-        String result = newBeeMallOrderService.closeOrder(ids);
+        String result = shopOrderService.updateOrderCloseStatus(orderIds);
         if (ServiceResultEnum.SUCCESS.getResult().equals(result)) {
             return ResultGenerator.genSuccessResult();
         } else {
             return ResultGenerator.genFailResult(result);
         }
     }
-
-
 }

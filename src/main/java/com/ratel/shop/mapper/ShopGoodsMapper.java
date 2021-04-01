@@ -12,6 +12,10 @@ public interface ShopGoodsMapper extends BaseMapper<ShopGoods> {
 
     List<ShopGoods> queryRatelShopGoodsPageList(PageQueryUtil pageQueryUtil);
 
+    int queryRatelShopGoodsCount(PageQueryUtil pageQueryUtil);
+
+    int batchUpdateSellStatus(@Param("ids") Long[] ids, @Param("sellStatus") int sellStatus);
+
     int deleteByPrimaryKey(Long goodsId);
 
     ShopGoods selectByPrimaryKey(Long goodsId);
@@ -22,7 +26,6 @@ public interface ShopGoodsMapper extends BaseMapper<ShopGoods> {
 
     int updateByPrimaryKey(ShopGoods record);
 
-    int getTotalNewBeeMallGoods(PageQueryUtil pageUtil);
 
     List<ShopGoods> selectByPrimaryKeys(List<Long> goodsIds);
 
@@ -34,6 +37,5 @@ public interface ShopGoodsMapper extends BaseMapper<ShopGoods> {
 
     int updateStockNum(@Param("stockNumDTOS") List<StockNumDTO> stockNumDTOS);
 
-    int batchUpdateSellStatus(@Param("orderIds") Long[] orderIds, @Param("sellStatus") int sellStatus);
 
 }

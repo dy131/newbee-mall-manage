@@ -18,7 +18,7 @@ $(function () {
     });
 
     new AjaxUpload('#uploadGoodsCoverImg', {
-        action: '/admin/upload/file',
+        action: '/upload/file',
         name: 'file',
         autoSubmit: true,
         responseType: "json",
@@ -132,7 +132,7 @@ $('#confirmButton').click(function () {
 });
 
 $('#saveButton').click(function () {
-    var goodsId = $('#goodsId').val();
+    var id = $('#id').val();
     var goodsCategoryId = $('#levelThree option:selected').val();
     var goodsName = $('#goodsName').val();
     var tag = $('#tag').val();
@@ -149,7 +149,7 @@ $('#saveButton').click(function () {
         });
         return;
     }
-    var url = '/admin/goods/save';
+    var url = '/goods/save';
     var swlMessage = '保存成功';
     var data = {
         "goodsName": goodsName,
@@ -164,11 +164,11 @@ $('#saveButton').click(function () {
         "goodsCarousel": goodsCoverImg,
         "goodsSellStatus": goodsSellStatus
     };
-    if (goodsId > 0) {
-        url = '/admin/goods/update';
+    if (id > 0) {
+        url = '/goods/update';
         swlMessage = '修改成功';
         data = {
-            "goodsId": goodsId,
+            "id": id,
             "goodsName": goodsName,
             "goodsIntro": goodsIntro,
             "goodsCategoryId": goodsCategoryId,
@@ -182,7 +182,6 @@ $('#saveButton').click(function () {
             "goodsSellStatus": goodsSellStatus
         };
     }
-    console.log(data);
     $.ajax({
         type: 'POST',
         url: url,
@@ -200,7 +199,7 @@ $('#saveButton').click(function () {
                     confirmButtonClass: 'btn btn-success',
                     buttonsStyling: false
                 }).then(function () {
-                    window.location.href = "/admin/goods";
+                    window.location.href = "/goods";
                 })
             } else {
                 $('#goodsModal').modal('hide');
@@ -224,7 +223,7 @@ $('#cancelButton').click(function () {
 
 $('#levelOne').on('change', function () {
     $.ajax({
-        url: '/admin/categories/listForSelect?categoryId=' + $(this).val(),
+        url: '/categories/listForSelect?id=' + $(this).val(),
         type: 'GET',
         success: function (result) {
             if (result.resultCode == 200) {
@@ -232,14 +231,14 @@ $('#levelOne').on('change', function () {
                 var secondLevelCategories = result.data.secondLevelCategories;
                 var length2 = secondLevelCategories.length;
                 for (var i = 0; i < length2; i++) {
-                    levelTwoSelect += '<option value=\"' + secondLevelCategories[i].categoryId + '\">' + secondLevelCategories[i].categoryName + '</option>';
+                    levelTwoSelect += '<option value=\"' + secondLevelCategories[i].id + '\">' + secondLevelCategories[i].categoryName + '</option>';
                 }
                 $('#levelTwo').html(levelTwoSelect);
                 var levelThreeSelect = '';
                 var thirdLevelCategories = result.data.thirdLevelCategories;
                 var length3 = thirdLevelCategories.length;
                 for (var i = 0; i < length3; i++) {
-                    levelThreeSelect += '<option value=\"' + thirdLevelCategories[i].categoryId + '\">' + thirdLevelCategories[i].categoryName + '</option>';
+                    levelThreeSelect += '<option value=\"' + thirdLevelCategories[i].id + '\">' + thirdLevelCategories[i].categoryName + '</option>';
                 }
                 $('#levelThree').html(levelThreeSelect);
             } else {
@@ -259,7 +258,7 @@ $('#levelOne').on('change', function () {
 
 $('#levelTwo').on('change', function () {
     $.ajax({
-        url: '/admin/categories/listForSelect?categoryId=' + $(this).val(),
+        url: '/categories/listForSelect?id=' + $(this).val(),
         type: 'GET',
         success: function (result) {
             if (result.resultCode == 200) {
@@ -267,7 +266,7 @@ $('#levelTwo').on('change', function () {
                 var thirdLevelCategories = result.data.thirdLevelCategories;
                 var length = thirdLevelCategories.length;
                 for (var i = 0; i < length; i++) {
-                    levelThreeSelect += '<option value=\"' + thirdLevelCategories[i].categoryId + '\">' + thirdLevelCategories[i].categoryName + '</option>';
+                    levelThreeSelect += '<option value=\"' + thirdLevelCategories[i].id + '\">' + thirdLevelCategories[i].categoryName + '</option>';
                 }
                 $('#levelThree').html(levelThreeSelect);
             } else {

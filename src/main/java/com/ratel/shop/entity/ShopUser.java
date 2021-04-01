@@ -1,12 +1,14 @@
 package com.ratel.shop.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 @Data
 @Builder
 @TableName("t_shop_user")
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class ShopUser extends BaseEntity {
 
     private Long userId;
@@ -19,7 +21,7 @@ public class ShopUser extends BaseEntity {
 
     private String introduceSign;
 
-    private Byte isDeleted;
+    private Integer isDeleted;
 
-    private Byte lockedFlag;
+    private Integer lockedFlag;
 }

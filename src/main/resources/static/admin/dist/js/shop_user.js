@@ -1,6 +1,6 @@
 $(function () {
     $("#jqGrid").jqGrid({
-        url: '/admin/users/list',
+        url: '/users/list',
         datatype: "json",
         colModel: [
             {label: 'id', name: 'userId', index: 'userId', width: 50, key: true, hidden: true},
@@ -70,8 +70,8 @@ function reload() {
 
 
 function lockUser(lockStatus) {
-    var ids = getSelectedRows();
-    if (ids == null) {
+    var userIds = getSelectedRows();
+    if (userIds == null) {
         return;
     }
     if (lockStatus != 0 && lockStatus != 1) {
@@ -89,9 +89,9 @@ function lockUser(lockStatus) {
             if (flag) {
                 $.ajax({
                     type: "POST",
-                    url: "/admin/users/lock/" + lockStatus,
+                    url: "/users/lock/" + lockStatus,
                     contentType: "application/json",
-                    data: JSON.stringify(ids),
+                    data: JSON.stringify(userIds),
                     success: function (r) {
                         if (r.resultCode == 200) {
                             swal("操作成功", {

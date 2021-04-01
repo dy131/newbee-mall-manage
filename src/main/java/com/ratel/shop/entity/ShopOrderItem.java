@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Builder;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 @TableName("t_shop_order_item")
@@ -19,7 +21,7 @@ public class ShopOrderItem {
 
     private String goodsCoverImg;
 
-    private Integer sellingPrice;
+    private BigDecimal sellingPrice;
 
     private Integer goodsCount;
 }

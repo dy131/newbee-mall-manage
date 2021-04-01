@@ -20,6 +20,12 @@ public interface ShopGoodsService {
 
     String insertRatelShopGoods(ShopGoods shopGoods);
 
+    String updateRatelShopGoods(ShopGoods shopGoods);
+
+    ShopGoods queryRatelShopGoodsById(Long id);
+
+    Boolean batchUpdateSellStatus(Long[] ids, int sellStatus);
+
     /**
      * 批量新增商品数据
      *
@@ -28,28 +34,6 @@ public interface ShopGoodsService {
      */
     void batchSaveNewBeeMallGoods(List<ShopGoods> newBeeMallGoodsList);
 
-    /**
-     * 修改商品信息
-     *
-     * @param goods
-     * @return
-     */
-    String updateNewBeeMallGoods(ShopGoods goods);
 
-    /**
-     * 获取商品详情
-     *
-     * @param id
-     * @return
-     */
-    ShopGoods getNewBeeMallGoodsById(Long id);
-
-    /**
-     * 批量修改销售状态(上架下架)
-     *
-     * @param ids
-     * @return
-     */
-    Boolean batchUpdateSellStatus(Long[] ids, int sellStatus);
 
 }

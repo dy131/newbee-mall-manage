@@ -3,7 +3,7 @@ $(function () {
         url: '/goods/list',
         datatype: "json",
         colModel: [
-            {label: '商品编号', name: 'goodsId', index: 'goodsId', width: 60, key: true},
+            {label: '商品编号', name: 'id', index: 'id', width: 60, key: true},
             {label: '商品名', name: 'goodsName', index: 'goodsName', width: 120},
             {label: '商品简介', name: 'goodsIntro', index: 'goodsIntro', width: 120},
             {label: '商品图片', name: 'goodsCoverImg', index: 'goodsCoverImg', width: 120, formatter: coverImageFormatter},
@@ -80,7 +80,6 @@ function reload() {
  * 添加商品
  */
 function addGoods() {
-    alert('添加商品')
     window.location.href = "/goods/edit";
 }
 
@@ -92,7 +91,7 @@ function editGoods() {
     if (id == null) {
         return;
     }
-    window.location.href = "/admin/goods/edit/" + id;
+    window.location.href = "/goods/edit/" + id;
 }
 
 /**
@@ -113,7 +112,7 @@ function putUpGoods() {
             if (flag) {
                 $.ajax({
                     type: "PUT",
-                    url: "/admin/goods/status/0",
+                    url: "/goods/status/0",
                     contentType: "application/json",
                     data: JSON.stringify(ids),
                     success: function (r) {
@@ -131,8 +130,7 @@ function putUpGoods() {
                 });
             }
         }
-    )
-    ;
+    );
 }
 
 /**
@@ -153,7 +151,7 @@ function putDownGoods() {
             if (flag) {
                 $.ajax({
                     type: "PUT",
-                    url: "/admin/goods/status/1",
+                    url: "/goods/status/1",
                     contentType: "application/json",
                     data: JSON.stringify(ids),
                     success: function (r) {
@@ -171,6 +169,5 @@ function putDownGoods() {
                 });
             }
         }
-    )
-    ;
+    );
 }

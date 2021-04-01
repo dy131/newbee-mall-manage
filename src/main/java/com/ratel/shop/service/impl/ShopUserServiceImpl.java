@@ -14,21 +14,21 @@ import java.util.List;
 public class ShopUserServiceImpl implements ShopUserService {
 
     @Resource
-    private ShopUserMapper mallUserMapper;
+    private ShopUserMapper shopUserMapper;
 
     @Override
-    public PageResult getNewBeeMallUsersPage(PageQueryUtil pageUtil) {
-        List<ShopUser> mallUsers = mallUserMapper.findMallUserList(pageUtil);
-        int total = mallUserMapper.getTotalMallUsers(pageUtil);
-        PageResult pageResult = new PageResult(mallUsers, total, pageUtil.getLimit(), pageUtil.getPage());
+    public PageResult queryShopUserPageList(PageQueryUtil pageQueryUtil) {
+        List<ShopUser> mallUsers = shopUserMapper.queryShopUserPageList(pageQueryUtil);
+        int total = shopUserMapper.queryShopUserPageCount(pageQueryUtil);
+        PageResult pageResult = new PageResult(mallUsers, total, pageQueryUtil.getLimit(), pageQueryUtil.getPage());
         return pageResult;
     }
 
     @Override
-    public Boolean lockUsers(Integer[] ids, int lockStatus) {
-        if (ids.length < 1) {
+    public Boolean lockUsers(Integer[] userIds, int lockStatus) {
+        if (userIds.length < 1) {
             return false;
         }
-        return mallUserMapper.lockUserBatch(ids, lockStatus) > 0;
+        return shopUserMapper.lockUserBatch(userIds, lockStatus) > 0;
     }
 }

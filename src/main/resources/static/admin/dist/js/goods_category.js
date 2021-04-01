@@ -3,10 +3,10 @@ $(function () {
     var parentId = $("#parentId").val();
 
     $("#jqGrid").jqGrid({
-        url: '/admin/categories/list?categoryLevel=' + categoryLevel + '&parentId=' + parentId,
+        url: '/categories/list?categoryLevel=' + categoryLevel + '&parentId=' + parentId,
         datatype: "json",
         colModel: [
-            {label: 'id', name: 'categoryId', index: 'categoryId', width: 50, key: true, hidden: true},
+            {label: 'id', name: 'id', index: 'id', width: 50, key: true, hidden: true},
             {label: '分类名称', name: 'categoryName', index: 'categoryName', width: 240},
             {label: '排序值', name: 'categoryRank', index: 'categoryRank', width: 120},
             {label: '添加时间', name: 'createTime', index: 'createTime', width: 120}
@@ -71,7 +71,7 @@ function categoryManage() {
     }
     if (categoryLevel == 1 || categoryLevel == 2) {
         categoryLevel = categoryLevel + 1;
-        window.location.href = '/admin/categories?categoryLevel=' + categoryLevel + '&parentId=' + id + '&backParentId=' + parentId;
+        window.location.href = '/categories?categoryLevel=' + categoryLevel + '&parentId=' + id + '&backParentId=' + parentId;
     } else {
         swal("无下级分类", {
             icon: "warning",
@@ -87,7 +87,7 @@ function categoryBack() {
     var backParentId = $("#backParentId").val();
     if (categoryLevel == 2 || categoryLevel == 3) {
         categoryLevel = categoryLevel - 1;
-        window.location.href = '/admin/categories?categoryLevel=' + categoryLevel + '&parentId=' + backParentId + '&backParentId=0';
+        window.location.href = '/categories?categoryLevel=' + categoryLevel + '&parentId=' + backParentId + '&backParentId=0';
     } else {
         swal("无上级分类", {
             icon: "warning",
@@ -111,10 +111,10 @@ $('#saveButton').click(function () {
             "parentId": parentId,
             "categoryRank": categoryRank
         };
-        var url = '/admin/categories/save';
+        var url = '/categories/save';
         var id = getSelectedRowWithoutAlert();
         if (id != null) {
-            url = '/admin/categories/update';
+            url = '/categories/update';
             data = {
                 "categoryId": id,
                 "categoryName": categoryName,
@@ -124,7 +124,7 @@ $('#saveButton').click(function () {
             };
         }
         $.ajax({
-            type: 'POST',//方法类型
+            type: 'POST',
             url: url,
             contentType: 'application/json',
             data: JSON.stringify(data),
@@ -190,7 +190,7 @@ function deleteCagegory() {
             if (flag) {
                 $.ajax({
                     type: "POST",
-                    url: "/admin/categories/delete",
+                    url: "/categories/delete",
                     contentType: "application/json",
                     data: JSON.stringify(ids),
                     success: function (r) {
@@ -211,7 +211,6 @@ function deleteCagegory() {
     )
     ;
 }
-
 
 function reset() {
     $("#categoryName").val('');

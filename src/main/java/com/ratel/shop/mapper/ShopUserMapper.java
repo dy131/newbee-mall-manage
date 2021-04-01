@@ -8,6 +8,16 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface ShopUserMapper extends BaseMapper<ShopUser> {
+
+    List<ShopUser> queryShopUserPageList(PageQueryUtil pageQueryUtil);
+
+    int queryShopUserPageCount(PageQueryUtil pageQueryUtil);
+
+    int lockUserBatch(@Param("userIds") Integer[] userIds, @Param("lockStatus") int lockStatus);
+
+
+
+
     int deleteByPrimaryKey(Long userId);
 
     int insert(ShopUser record);
@@ -23,10 +33,4 @@ public interface ShopUserMapper extends BaseMapper<ShopUser> {
     int updateByPrimaryKeySelective(ShopUser record);
 
     int updateByPrimaryKey(ShopUser record);
-
-    List<ShopUser> findMallUserList(PageQueryUtil pageUtil);
-
-    int getTotalMallUsers(PageQueryUtil pageUtil);
-
-    int lockUserBatch(@Param("ids") Integer[] ids, @Param("lockStatus") int lockStatus);
 }

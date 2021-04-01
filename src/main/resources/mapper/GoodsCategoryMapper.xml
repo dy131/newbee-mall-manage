@@ -15,11 +15,11 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,category_id, category_level, parent_id, category_name, category_rank, is_deleted,
+        id, category_level, parent_id, category_name, category_rank, is_deleted,
         create_time, create_user, update_time, update_user
     </sql>
 
-    <select id="queryShopCategoryLevelByParentId" resultMap="BaseResultMap">
+    <select id="queryShopCategoryLevelByParentId" resultType="com.ratel.shop.entity.GoodsCategory">
         SELECT
         <include refid="Base_Column_List"/>
         FROM t_goods_category
@@ -28,40 +28,44 @@
             #{parentId}
         </foreach>
         AND category_level = #{categoryLevel} AND is_deleted = 0
-        ORDER BY category_rank DESC
+        ORDER BY category_rank ASC
     </select>
 
-
-    <select id="findGoodsCategoryList" parameterType="Map" resultMap="BaseResultMap">
-        select
+    <select id="queryGoodsCategoryPageList" parameterType="Map" resultType="com.ratel.shop.entity.GoodsCategory">
+        SELECT
         <include refid="Base_Column_List"/>
-        from tb_newbee_mall_goods_category
+        FROM t_goods_category
         <where>
             <if test="categoryLevel!=null and categoryLevel!=''">
-                and category_level = #{categoryLevel}
+                AND category_level = #{categoryLevel}
             </if>
             <if test="parentId!=null and parentId!=''">
-                and parent_id = #{parentId}
+                AND parent_id = #{parentId}
             </if>
-            and is_deleted = 0
+            AND is_deleted = 0
         </where>
-        order by category_rank desc
+        ORDER BY category_rank ASC
         <if test="start!=null and limit!=null">
-            limit #{start},#{limit}
+            LIMIT #{start},#{limit}
         </if>
     </select>
-    <select id="getTotalGoodsCategories" parameterType="Map" resultType="int">
-        select count(*) from tb_newbee_mall_goods_category
+
+    <select id="queryGoodsCategoryCount" parameterType="Map" resultType="int">
+        SELECT
+        COUNT(1)
+        FROM t_goods_category
         <where>
             <if test="categoryLevel!=null and categoryLevel!=''">
-                and category_level = #{categoryLevel}
+                AND category_level = #{categoryLevel}
             </if>
             <if test="parentId!=null and parentId!=''">
-                and parent_id = #{parentId}
+                AND parent_id = #{parentId}
             </if>
-            and is_deleted = 0
+            AND is_deleted = 0
         </where>
     </select>
+
+
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
@@ -87,16 +91,7 @@
             #{id}
         </foreach>
     </update>
-    <insert id="insert" parameterType="com.ratel.shop.entity.GoodsCategory">
-    insert into tb_newbee_mall_goods_category (category_id, category_level, parent_id, 
-      category_name, category_rank, is_deleted, 
-      create_time, create_user, update_time, 
-      update_user)
-    values (#{categoryId,jdbcType=BIGINT}, #{categoryLevel,jdbcType=TINYINT}, #{parentId,jdbcType=BIGINT}, 
-      #{categoryName,jdbcType=VARCHAR}, #{categoryRank,jdbcType=INTEGER}, #{isDeleted,jdbcType=TINYINT}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{createUser,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{updateUser,jdbcType=INTEGER})
-  </insert>
+
     <insert id="insertSelective" parameterType="com.ratel.shop.entity.GoodsCategory">
         insert into tb_newbee_mall_goods_category
         <trim prefix="(" suffix=")" suffixOverrides=",">

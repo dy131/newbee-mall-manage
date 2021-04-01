@@ -1,5 +1,6 @@
 package com.ratel.shop.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ratel.shop.common.ServiceResultEnum;
 import com.ratel.shop.entity.GoodsCategory;
 import com.ratel.shop.mapper.GoodsCategoryMapper;
@@ -19,20 +20,24 @@ public class ShopCategoryServiceImpl implements ShopCategoryService {
     private GoodsCategoryMapper goodsCategoryMapper;
 
     @Override
-    public PageResult getCategorisPage(PageQueryUtil pageUtil) {
-        List<GoodsCategory> goodsCategories = goodsCategoryMapper.findGoodsCategoryList(pageUtil);
-        int total = goodsCategoryMapper.getTotalGoodsCategories(pageUtil);
-        PageResult pageResult = new PageResult(goodsCategories, total, pageUtil.getLimit(), pageUtil.getPage());
+    public PageResult getGoodsCategoryPageList(PageQueryUtil pageQueryUtil) {
+        List<GoodsCategory> goodsCategoriesList = goodsCategoryMapper.queryGoodsCategoryPageList(pageQueryUtil);
+        int total = goodsCategoryMapper.queryGoodsCategoryCount(pageQueryUtil);
+        PageResult pageResult = new PageResult(goodsCategoriesList, total, pageQueryUtil.getLimit(), pageQueryUtil.getPage());
         return pageResult;
     }
 
     @Override
-    public String saveCategory(GoodsCategory goodsCategory) {
-        GoodsCategory temp = goodsCategoryMapper.selectByLevelAndName(goodsCategory.getCategoryLevel(), goodsCategory.getCategoryName());
-        if (temp != null) {
+    public String insertGoodsCategory(GoodsCategory goodsCategory) {
+        QueryWrapper<GoodsCategory> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("category_name", goodsCategory.getCategoryName());
+        queryWrapper.eq("category_level", goodsCategory.getCategoryLevel());
+        queryWrapper.eq("is_deleted", 0);
+        GoodsCategory goodsCategory1 = goodsCategoryMapper.selectOne(queryWrapper);
+        if (goodsCategory1 != null) {
             return ServiceResultEnum.SAME_CATEGORY_EXIST.getResult();
         }
-        if (goodsCategoryMapper.insertSelective(goodsCategory) > 0) {
+        if (goodsCategoryMapper.insert(goodsCategory) > 0) {
             return ServiceResultEnum.SUCCESS.getResult();
         }
         return ServiceResultEnum.DB_ERROR.getResult();
@@ -40,25 +45,41 @@ public class ShopCategoryServiceImpl implements ShopCategoryService {
 
     @Override
     public String updateGoodsCategory(GoodsCategory goodsCategory) {
-        GoodsCategory temp = goodsCategoryMapper.selectByPrimaryKey(goodsCategory.getId());
-        if (temp == null) {
+        QueryWrapper<GoodsCategory> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", goodsCategory.getId());
+        queryWrapper.eq("is_deleted", 0);
+        GoodsCategory goodsCategory1 = goodsCategoryMapper.selectOne(queryWrapper);
+        if (goodsCategory1 == null) {
             return ServiceResultEnum.DATA_NOT_EXIST.getResult();
         }
-        GoodsCategory temp2 = goodsCategoryMapper.selectByLevelAndName(goodsCategory.getCategoryLevel(), goodsCategory.getCategoryName());
-        if (temp2 != null && !temp2.getId().equals(goodsCategory.getId())) {
-            //同名且不同id 不能继续修改
+        queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("category_name", goodsCategory.getCategoryName());
+        queryWrapper.eq("category_level", goodsCategory.getCategoryLevel());
+        queryWrapper.eq("is_deleted", 0);
+        goodsCategory1 = goodsCategoryMapper.selectOne(queryWrapper);
+        if (goodsCategory1 != null && !goodsCategory1.getId().equals(goodsCategory.getId())) {
             return ServiceResultEnum.SAME_CATEGORY_EXIST.getResult();
         }
         goodsCategory.setUpdateTime(new Date());
-        if (goodsCategoryMapper.updateByPrimaryKeySelective(goodsCategory) > 0) {
+        queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", goodsCategory.getId());
+        if (goodsCategoryMapper.update(goodsCategory, queryWrapper) > 0) {
             return ServiceResultEnum.SUCCESS.getResult();
         }
         return ServiceResultEnum.DB_ERROR.getResult();
     }
 
     @Override
-    public GoodsCategory getGoodsCategoryById(Long id) {
-        return goodsCategoryMapper.selectByPrimaryKey(id);
+    public List<GoodsCategory> queryShopCategoryLevelByParentId(List<Long> parentIds, int categoryLevel) {
+        return goodsCategoryMapper.queryShopCategoryLevelByParentId(parentIds, categoryLevel);
+    }
+
+    @Override
+    public GoodsCategory queryGoodsCategoryById(Long categoryId) {
+        QueryWrapper<GoodsCategory> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", categoryId);
+        queryWrapper.eq("is_deleted", 0);
+        return goodsCategoryMapper.selectOne(queryWrapper);
     }
 
     @Override
@@ -70,8 +91,5 @@ public class ShopCategoryServiceImpl implements ShopCategoryService {
         return goodsCategoryMapper.deleteBatch(ids) > 0;
     }
 
-    @Override
-    public List<GoodsCategory> queryShopCategoryLevelByParentId(List<Long> parentIds, int categoryLevel) {
-        return goodsCategoryMapper.queryShopCategoryLevelByParentId(parentIds, categoryLevel);
-    }
+
 }

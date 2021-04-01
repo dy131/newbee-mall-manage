@@ -15,9 +15,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GoodsCategory extends BaseEntity {
-
-    // 商品分类ID
-    private Long categoryId;
     // 分类等级
     private Integer categoryLevel;
     // 父ID

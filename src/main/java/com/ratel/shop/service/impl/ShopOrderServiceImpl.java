@@ -1,5 +1,7 @@
 package com.ratel.shop.service.impl;
 
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ratel.shop.common.ServiceResultEnum;
 import com.ratel.shop.common.ShopOrderStatusEnum;
 import com.ratel.shop.entity.ShopOrder;
@@ -12,7 +14,6 @@ import com.ratel.shop.util.PageResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
@@ -23,27 +24,30 @@ import java.util.List;
 public class ShopOrderServiceImpl implements ShopOrderService {
 
     @Resource
-    private ShopOrderMapper newBeeMallOrderMapper;
+    private ShopOrderMapper shopOrderMapper;
     @Resource
-    private ShopOrderItemMapper newBeeMallOrderItemMapper;
+    private ShopOrderItemMapper shopOrderItemMapper;
 
     @Override
-    public PageResult getNewBeeMallOrdersPage(PageQueryUtil pageUtil) {
-        List<ShopOrder> newBeeMallOrders = newBeeMallOrderMapper.findNewBeeMallOrderList(pageUtil);
-        int total = newBeeMallOrderMapper.getTotalNewBeeMallOrders(pageUtil);
-        PageResult pageResult = new PageResult(newBeeMallOrders, total, pageUtil.getLimit(), pageUtil.getPage());
+    public PageResult queryShopOrderPageList(PageQueryUtil pageQueryUtil) {
+        List<ShopOrder> shopOrders = shopOrderMapper.queryShopOrderPageList(pageQueryUtil);
+        int total = shopOrderMapper.queryShopOrderPageCount(pageQueryUtil);
+        PageResult pageResult = new PageResult(shopOrders, total, pageQueryUtil.getLimit(), pageQueryUtil.getPage());
         return pageResult;
     }
 
     @Override
     @Transactional
-    public String updateOrderInfo(ShopOrder newBeeMallOrder) {
-        ShopOrder temp = newBeeMallOrderMapper.selectByPrimaryKey(newBeeMallOrder.getOrderId());
-        //不为空且orderStatus>=0且状态为出库之前可以修改部分信息
-        if (temp != null && temp.getOrderStatus() >= 0 && temp.getOrderStatus() < 3) {
-            temp.setTotalPrice(newBeeMallOrder.getTotalPrice());
-            temp.setUpdateTime(new Date());
-            if (newBeeMallOrderMapper.updateByPrimaryKeySelective(temp) > 0) {
+    public String updateShopOrder(ShopOrder shopOrder) {
+        QueryWrapper<ShopOrder> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("order_id", shopOrder.getOrderId());
+        ShopOrder shopOrder1 = shopOrderMapper.selectOne(queryWrapper);
+        if (shopOrder1 != null && shopOrder1.getOrderStatus() >= 0 && shopOrder1.getOrderStatus() < 3) {
+            shopOrder1.setTotalPrice(shopOrder.getTotalPrice());
+            shopOrder1.setUpdateTime(new Date());
+            queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("order_id", shopOrder.getOrderId());
+            if (shopOrderMapper.update(shopOrder1, queryWrapper) > 0) {
                 return ServiceResultEnum.SUCCESS.getResult();
             }
             return ServiceResultEnum.DB_ERROR.getResult();
@@ -52,30 +56,43 @@ public class ShopOrderServiceImpl implements ShopOrderService {
     }
 
     @Override
+    public List<ShopOrderItem> queryOrderDetailByOrderId(Long orderId) {
+        QueryWrapper<ShopOrder> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("order_id", orderId);
+        ShopOrder shopOrder = shopOrderMapper.selectOne(queryWrapper);
+        if (shopOrder != null) {
+            QueryWrapper<ShopOrderItem> queryWrapper1 = new QueryWrapper<>();
+            queryWrapper1.eq("order_id", shopOrder.getOrderId());
+            List<ShopOrderItem> shopOrderItems = shopOrderItemMapper.selectList(queryWrapper1);
+            if (!CollectionUtils.isEmpty(shopOrderItems)) {
+                return shopOrderItems;
+            }
+        }
+        return null;
+    }
+
+    @Override
     @Transactional
-    public String checkDone(Long[] ids) {
-        //查询所有的订单 判断状态 修改状态和更新时间
-        List<ShopOrder> orders = newBeeMallOrderMapper.selectByPrimaryKeys(Arrays.asList(ids));
+    public String updateOrderAllotStatus(Long[] orderIds) {
+        List<ShopOrder> shopOrders = shopOrderMapper.queryShopOrderByOrderIds(Arrays.asList(orderIds));
         String errorOrderNos = "";
-        if (!CollectionUtils.isEmpty(orders)) {
-            for (ShopOrder newBeeMallOrder : orders) {
-                if (newBeeMallOrder.getIsDeleted() == 1) {
-                    errorOrderNos += newBeeMallOrder.getOrderNo() + " ";
+        if (!CollectionUtils.isEmpty(shopOrders)) {
+            for (ShopOrder shopOrder : shopOrders) {
+                if (shopOrder.getIsDeleted() == 1) {
+                    errorOrderNos += shopOrder.getOrderNo() + " ";
                     continue;
                 }
-                if (newBeeMallOrder.getOrderStatus() != 1) {
-                    errorOrderNos += newBeeMallOrder.getOrderNo() + " ";
+                if (shopOrder.getOrderStatus() != 1) {
+                    errorOrderNos += shopOrder.getOrderNo() + " ";
                 }
             }
-            if (StringUtils.isEmpty(errorOrderNos)) {
-                //订单状态正常 可以执行配货完成操作 修改订单状态和更新时间
-                if (newBeeMallOrderMapper.checkDone(Arrays.asList(ids)) > 0) {
+            if (StrUtil.isBlank(errorOrderNos)) {
+                if (shopOrderMapper.updateOrderAllotStatus(Arrays.asList(orderIds)) > 0) {
                     return ServiceResultEnum.SUCCESS.getResult();
                 } else {
                     return ServiceResultEnum.DB_ERROR.getResult();
                 }
             } else {
-                //订单此时不可执行出库操作
                 if (errorOrderNos.length() > 0 && errorOrderNos.length() < 100) {
                     return errorOrderNos + "订单的状态不是支付成功无法执行出库操作";
                 } else {
@@ -83,35 +100,31 @@ public class ShopOrderServiceImpl implements ShopOrderService {
                 }
             }
         }
-        //未查询到数据 返回错误提示
         return ServiceResultEnum.DATA_NOT_EXIST.getResult();
     }
 
     @Override
     @Transactional
-    public String checkOut(Long[] ids) {
-        //查询所有的订单 判断状态 修改状态和更新时间
-        List<ShopOrder> orders = newBeeMallOrderMapper.selectByPrimaryKeys(Arrays.asList(ids));
+    public String updateOrderOutStatus(Long[] orderIds) {
+        List<ShopOrder> shopOrders = shopOrderMapper.queryShopOrderByOrderIds(Arrays.asList(orderIds));
         String errorOrderNos = "";
-        if (!CollectionUtils.isEmpty(orders)) {
-            for (ShopOrder newBeeMallOrder : orders) {
-                if (newBeeMallOrder.getIsDeleted() == 1) {
-                    errorOrderNos += newBeeMallOrder.getOrderNo() + " ";
+        if (!CollectionUtils.isEmpty(shopOrders)) {
+            for (ShopOrder shopOrder : shopOrders) {
+                if (shopOrder.getIsDeleted() == 1) {
+                    errorOrderNos += shopOrder.getOrderNo() + " ";
                     continue;
                 }
-                if (newBeeMallOrder.getOrderStatus() != 1 && newBeeMallOrder.getOrderStatus() != 2) {
-                    errorOrderNos += newBeeMallOrder.getOrderNo() + " ";
+                if (shopOrder.getOrderStatus() != 2) {
+                    errorOrderNos += shopOrder.getOrderNo() + " ";
                 }
             }
-            if (StringUtils.isEmpty(errorOrderNos)) {
-                //订单状态正常 可以执行出库操作 修改订单状态和更新时间
-                if (newBeeMallOrderMapper.checkOut(Arrays.asList(ids)) > 0) {
+            if (StrUtil.isBlank(errorOrderNos)) {
+                if (shopOrderMapper.updateOrderOutStatus(Arrays.asList(orderIds)) > 0) {
                     return ServiceResultEnum.SUCCESS.getResult();
                 } else {
                     return ServiceResultEnum.DB_ERROR.getResult();
                 }
             } else {
-                //订单此时不可执行出库操作
                 if (errorOrderNos.length() > 0 && errorOrderNos.length() < 100) {
                     return errorOrderNos + "订单的状态不是支付成功或配货完成无法执行出库操作";
                 } else {
@@ -119,37 +132,32 @@ public class ShopOrderServiceImpl implements ShopOrderService {
                 }
             }
         }
-        //未查询到数据 返回错误提示
         return ServiceResultEnum.DATA_NOT_EXIST.getResult();
     }
 
     @Override
     @Transactional
-    public String closeOrder(Long[] ids) {
-        //查询所有的订单 判断状态 修改状态和更新时间
-        List<ShopOrder> orders = newBeeMallOrderMapper.selectByPrimaryKeys(Arrays.asList(ids));
+    public String updateOrderCloseStatus(Long[] orderIds) {
+        List<ShopOrder> shopOrders = shopOrderMapper.queryShopOrderByOrderIds(Arrays.asList(orderIds));
         String errorOrderNos = "";
-        if (!CollectionUtils.isEmpty(orders)) {
-            for (ShopOrder newBeeMallOrder : orders) {
-                // isDeleted=1 一定为已关闭订单
-                if (newBeeMallOrder.getIsDeleted() == 1) {
-                    errorOrderNos += newBeeMallOrder.getOrderNo() + " ";
+        if (!CollectionUtils.isEmpty(shopOrders)) {
+            for (ShopOrder shopOrder : shopOrders) {
+                if (shopOrder.getIsDeleted() == 1) {
+                    errorOrderNos += shopOrder.getOrderNo() + " ";
                     continue;
                 }
-                //已关闭或者已完成无法关闭订单
-                if (newBeeMallOrder.getOrderStatus() == 4 || newBeeMallOrder.getOrderStatus() < 0) {
-                    errorOrderNos += newBeeMallOrder.getOrderNo() + " ";
+                // 已完成无法关闭订单
+                if (shopOrder.getOrderStatus() == 4 || shopOrder.getOrderStatus() < 0) {
+                    errorOrderNos += shopOrder.getOrderNo() + " ";
                 }
             }
-            if (StringUtils.isEmpty(errorOrderNos)) {
-                //订单状态正常 可以执行关闭操作 修改订单状态和更新时间
-                if (newBeeMallOrderMapper.closeOrder(Arrays.asList(ids), ShopOrderStatusEnum.ORDER_CLOSED_BY_JUDGE.getOrderStatus()) > 0) {
+            if (StrUtil.isBlank(errorOrderNos)) {
+                if (shopOrderMapper.updateOrderCloseStatus(Arrays.asList(orderIds), ShopOrderStatusEnum.ORDER_CLOSED_BY_JUDGE.getOrderStatus()) > 0) {
                     return ServiceResultEnum.SUCCESS.getResult();
                 } else {
                     return ServiceResultEnum.DB_ERROR.getResult();
                 }
             } else {
-                //订单此时不可执行关闭操作
                 if (errorOrderNos.length() > 0 && errorOrderNos.length() < 100) {
                     return errorOrderNos + "订单不能执行关闭操作";
                 } else {
@@ -159,18 +167,5 @@ public class ShopOrderServiceImpl implements ShopOrderService {
         }
         //未查询到数据 返回错误提示
         return ServiceResultEnum.DATA_NOT_EXIST.getResult();
-    }
-
-    @Override
-    public List<ShopOrderItem> getOrderItems(Long id) {
-        ShopOrder newBeeMallOrder = newBeeMallOrderMapper.selectByPrimaryKey(id);
-        if (newBeeMallOrder != null) {
-            List<ShopOrderItem> orderItems = newBeeMallOrderItemMapper.selectByOrderId(newBeeMallOrder.getOrderId());
-            //获取订单项数据
-            if (!CollectionUtils.isEmpty(orderItems)) {
-                return orderItems;
-            }
-        }
-        return null;
     }
 }

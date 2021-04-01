@@ -8,9 +8,15 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface GoodsCategoryMapper extends BaseMapper<GoodsCategory> {
+
+    List<GoodsCategory> queryGoodsCategoryPageList(PageQueryUtil pageQueryUtil);
+
+    int queryGoodsCategoryCount(PageQueryUtil pageQueryUtil);
+
+    List<GoodsCategory> queryShopCategoryLevelByParentId(@Param("parentIds") List<Long> parentIds, @Param("categoryLevel") int categoryLevel);
+
     int deleteByPrimaryKey(Long categoryId);
 
-    int insert(GoodsCategory record);
 
     int insertSelective(GoodsCategory record);
 
@@ -22,11 +28,9 @@ public interface GoodsCategoryMapper extends BaseMapper<GoodsCategory> {
 
     int updateByPrimaryKey(GoodsCategory record);
 
-    List<GoodsCategory> findGoodsCategoryList(PageQueryUtil pageUtil);
 
-    int getTotalGoodsCategories(PageQueryUtil pageUtil);
 
     int deleteBatch(Integer[] ids);
 
-    List<GoodsCategory> queryShopCategoryLevelByParentId(@Param("parentIds") List<Long> parentIds, @Param("categoryLevel") int categoryLevel);
+
 }

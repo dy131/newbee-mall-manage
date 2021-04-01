@@ -1,35 +1,23 @@
 package com.ratel.shop.service;
 
+import com.ratel.shop.entity.ShopOrder;
 import com.ratel.shop.entity.ShopOrderItem;
 import com.ratel.shop.util.PageQueryUtil;
 import com.ratel.shop.util.PageResult;
-import com.ratel.shop.entity.ShopOrder;
 
 import java.util.List;
 
 public interface ShopOrderService {
 
-    PageResult getNewBeeMallOrdersPage(PageQueryUtil pageUtil);
+    PageResult queryShopOrderPageList(PageQueryUtil pageQueryUtil);
 
-    /**
-     * 订单信息修改
-     */
-    String updateOrderInfo(ShopOrder newBeeMallOrder);
+    String updateShopOrder(ShopOrder shopOrder);
 
-    /**
-     * 配货
-     */
-    String checkDone(Long[] ids);
+    List<ShopOrderItem> queryOrderDetailByOrderId(Long orderId);
 
-    /**
-     * 出库
-     */
-    String checkOut(Long[] ids);
+    String updateOrderAllotStatus(Long[] orderIds);
 
-    /**
-     * 关闭订单
-     */
-    String closeOrder(Long[] ids);
+    String updateOrderOutStatus(Long[] orderIds);
 
-    List<ShopOrderItem> getOrderItems(Long id);
+    String updateOrderCloseStatus(Long[] orderIds);
 }

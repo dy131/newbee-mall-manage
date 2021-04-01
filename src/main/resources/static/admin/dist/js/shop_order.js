@@ -1,13 +1,13 @@
 $(function () {
     $("#jqGrid").jqGrid({
-        url: '/admin/orders/list',
+        url: '/orders/list',
         datatype: "json",
         colModel: [
             {label: 'id', name: 'orderId', index: 'orderId', width: 50, key: true, hidden: true},
             {label: '订单号', name: 'orderNo', index: 'orderNo', width: 120},
             {label: '订单总价', name: 'totalPrice', index: 'totalPrice', width: 60},
             {label: '订单状态', name: 'orderStatus', index: 'orderStatus', width: 80, formatter: orderStatusFormatter},
-            {label: '支付方式', name: 'payType', index: 'payType', width: 80,formatter:payTypeFormatter},
+            {label: '支付方式', name: 'payType', index: 'payType', width: 80, formatter: payTypeFormatter},
             {label: '创建时间', name: 'createTime', index: 'createTime', width: 120},
             {label: '操作', name: 'createTime', index: 'createTime', width: 120, formatter: operateFormatter}
         ],
@@ -97,7 +97,6 @@ $(function () {
  * jqGrid重新加载
  */
 function reload() {
-    initFlatPickr();
     var page = $("#jqGrid").jqGrid('getGridParam', 'page');
     $("#jqGrid").jqGrid('setGridParam', {
         page: page
@@ -106,20 +105,19 @@ function reload() {
 
 /**
  * 查看订单项信息
- * @param orderId
  */
 function openOrderItems(orderId) {
     $('.modal-title').html('订单详情');
     $.ajax({
-        type: 'GET',//方法类型
-        url: '/admin/order-items/' + orderId,
+        type: 'GET',
+        url: '/order-items/' + orderId,
         contentType: 'application/json',
         success: function (result) {
             if (result.resultCode == 200) {
                 $('#orderItemModal').modal('show');
                 var itemString = '';
                 for (i = 0; i < result.data.length; i++) {
-                    itemString += result.data[i].goodsName + ' x ' + result.data[i].goodsCount + ' 商品编号 ' + result.data[i].goodsId + ";<br>";
+                    itemString += result.data[i].goodsName + ' x ' + result.data[i].goodsCount + ', 商品价格: ' + result.data[i].sellingPrice + ', 商品编号: ' + result.data[i].goodsId + ";<br>";
                 }
                 $("#orderItemString").html(itemString);
             } else {
@@ -151,7 +149,6 @@ function orderEdit() {
     $('#orderInfoModal').modal('show');
     $("#orderId").val(id);
     $("#totalPrice").val(rowData.totalPrice);
-    reload();
 }
 
 
@@ -162,7 +159,7 @@ $('#saveButton').click(function () {
     var userPhone = $("#userPhone").val();
     var userAddress = $("#userAddress").val();
     var id = getSelectedRowWithoutAlert();
-    var url = '/admin/orders/update';
+    var url = '/orders/update';
     var data = {
         "orderId": id,
         "totalPrice": totalPrice,
@@ -171,7 +168,7 @@ $('#saveButton').click(function () {
         "userAddress": userAddress
     };
     $.ajax({
-        type: 'POST',//方法类型
+        type: 'POST',
         url: url,
         contentType: 'application/json',
         data: JSON.stringify(data),
@@ -235,7 +232,7 @@ function orderCheckDone() {
             if (flag) {
                 $.ajax({
                     type: "POST",
-                    url: "/admin/orders/checkDone",
+                    url: "/orders/checkDone",
                     contentType: "application/json",
                     data: JSON.stringify(ids),
                     success: function (r) {
@@ -268,7 +265,7 @@ function orderCheckOut() {
     var orderNos = '';
     for (i = 0; i < ids.length; i++) {
         var rowData = $("#jqGrid").jqGrid("getRowData", ids[i]);
-        if (rowData.orderStatus != '已支付' && rowData.orderStatus != '配货完成') {
+        if (rowData.orderStatus != '配货完成') {
             orderNos += rowData.orderNo + " ";
         }
     }
@@ -294,7 +291,7 @@ function orderCheckOut() {
             if (flag) {
                 $.ajax({
                     type: "POST",
-                    url: "/admin/orders/checkOut",
+                    url: "/orders/checkOut",
                     contentType: "application/json",
                     data: JSON.stringify(ids),
                     success: function (r) {
@@ -331,7 +328,7 @@ function closeOrder() {
             if (flag) {
                 $.ajax({
                     type: "POST",
-                    url: "/admin/orders/close",
+                    url: "/orders/close",
                     contentType: "application/json",
                     data: JSON.stringify(ids),
                     success: function (r) {
@@ -352,7 +349,6 @@ function closeOrder() {
     )
     ;
 }
-
 
 function reset() {
     $("#totalPrice").val(0);

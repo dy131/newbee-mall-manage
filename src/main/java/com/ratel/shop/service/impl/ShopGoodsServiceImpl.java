@@ -31,19 +31,35 @@ public class ShopGoodsServiceImpl implements ShopGoodsService {
     @Override
     public PageResult queryRatelShopGoodsPageList(PageQueryUtil pageQueryUtil) {
         List<ShopGoods> goodsList = shopGoodsMapper.queryRatelShopGoodsPageList(pageQueryUtil);
-        int total = shopGoodsMapper.getTotalNewBeeMallGoods(pageQueryUtil);
+        int total = shopGoodsMapper.queryRatelShopGoodsCount(pageQueryUtil);
         PageResult pageResult = new PageResult(goodsList, total, pageQueryUtil.getLimit(), pageQueryUtil.getPage());
         return pageResult;
     }
 
+    @Override
+    public String updateRatelShopGoods(ShopGoods shopGoods) {
+        ShopGoods shopGood = shopGoodsMapper.selectById(shopGoods.getId());
+        if (shopGood == null) {
+            return ServiceResultEnum.DATA_NOT_EXIST.getResult();
+        }
+        shopGoods.setId(shopGood.getId());
+        shopGoods.setUpdateTime(new Date());
+        if (shopGoodsMapper.updateById(shopGoods) > 0) {
+            return ServiceResultEnum.SUCCESS.getResult();
+        }
+        return ServiceResultEnum.DB_ERROR.getResult();
+    }
+
+    @Override
+    public ShopGoods queryRatelShopGoodsById(Long id) {
+        return shopGoodsMapper.selectById(id);
+    }
 
 
-
-
-
-
-
-
+    @Override
+    public Boolean batchUpdateSellStatus(Long[] ids, int sellStatus) {
+        return shopGoodsMapper.batchUpdateSellStatus(ids, sellStatus) > 0;
+    }
 
     @Override
     public void batchSaveNewBeeMallGoods(List<ShopGoods> newBeeMallGoodsList) {
@@ -52,26 +68,5 @@ public class ShopGoodsServiceImpl implements ShopGoodsService {
         }
     }
 
-    @Override
-    public String updateNewBeeMallGoods(ShopGoods goods) {
-        ShopGoods temp = shopGoodsMapper.selectByPrimaryKey(goods.getGoodsId());
-        if (temp == null) {
-            return ServiceResultEnum.DATA_NOT_EXIST.getResult();
-        }
-        goods.setUpdateTime(new Date());
-        if (shopGoodsMapper.updateByPrimaryKeySelective(goods) > 0) {
-            return ServiceResultEnum.SUCCESS.getResult();
-        }
-        return ServiceResultEnum.DB_ERROR.getResult();
-    }
 
-    @Override
-    public ShopGoods getNewBeeMallGoodsById(Long id) {
-        return shopGoodsMapper.selectByPrimaryKey(id);
-    }
-
-    @Override
-    public Boolean batchUpdateSellStatus(Long[] ids, int sellStatus) {
-        return shopGoodsMapper.batchUpdateSellStatus(ids, sellStatus) > 0;
-    }
 }

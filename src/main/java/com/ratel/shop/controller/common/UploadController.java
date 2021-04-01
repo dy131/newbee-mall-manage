@@ -1,12 +1,11 @@
 package com.ratel.shop.controller.common;
 
 import com.ratel.shop.common.Constants;
-import com.ratel.shop.util.ShopUtils;
 import com.ratel.shop.util.Result;
 import com.ratel.shop.util.ResultGenerator;
+import com.ratel.shop.util.ShopUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,7 +20,6 @@ import java.util.Date;
 import java.util.Random;
 
 @Controller
-@RequestMapping("/admin")
 public class UploadController {
 
     @PostMapping({"/upload/file"})
@@ -53,5 +51,4 @@ public class UploadController {
             return ResultGenerator.genFailResult("文件上传失败");
         }
     }
-
 }

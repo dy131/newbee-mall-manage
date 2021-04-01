@@ -3,7 +3,7 @@
 <mapper namespace="com.ratel.shop.mapper.ShopGoodsMapper">
 
     <sql id="Base_Column_List">
-        id,goods_id, goods_name, goods_intro,goods_category_id, goods_cover_img, goods_carousel, original_price,
+        id, goods_name, goods_intro,goods_category_id, goods_cover_img, goods_carousel, original_price,
         selling_price, stock_num, tag, goods_sell_status, create_user, create_time, update_user,
         update_time
     </sql>
@@ -26,10 +26,45 @@
                 AND create_time &lt; #{endTime}
             </if>
         </where>
-        ORDER BY goods_id DESC
+        ORDER BY id DESC
         <if test="start!=null and limit!=null">
             LIMIT #{start},#{limit}
         </if>
+    </select>
+
+    <select id="queryRatelShopGoodsCount" parameterType="Map" resultType="int">
+        SELECT COUNT(1) FROM t_shop_goods
+        <where>
+            <if test="goodsName!=null and goodsName!=''">
+                AND goods_name LIKE CONCAT('%','#{goodsName}','%')
+            </if>
+            <if test="goodsSellStatus!=null and goodsSellStatus!=''">
+                AND goods_sell_status = #{goodsSellStatus}
+            </if>
+            <if test="startTime != null and startTime.trim() != ''">
+                AND create_time &gt; #{startTime}
+            </if>
+            <if test="endTime != null and endTime.trim() != ''">
+                AND create_time &lt; #{endTime}
+            </if>
+        </where>
+    </select>
+
+    <update id="batchUpdateSellStatus">
+        UPDATE t_shop_goods
+        SET goods_sell_status=#{sellStatus},update_time=NOW() WHERE id IN
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from tb_newbee_mall_goods_info
+        where goods_id = #{goodsId,jdbcType=BIGINT}
     </select>
 
 
@@ -70,28 +105,13 @@
             (#{goods.goodsName},#{goods.goodsIntro},#{goods.goodsCategoryId},#{goods.goodsCoverImg},#{goods.goodsCarousel},#{goods.goodsDetailContent},#{goods.originalPrice},#{goods.sellingPrice},#{goods.stockNum})
         </foreach>
     </insert>
-    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
-        select
-        <include refid="Base_Column_List"/>
-        ,
-        <include refid="Blob_Column_List"/>
-        from tb_newbee_mall_goods_info
-        where goods_id = #{goodsId,jdbcType=BIGINT}
-    </select>
+
     <update id="updateStockNum">
         <foreach collection="stockNumDTOS" item="stockNumDTO">
             update tb_newbee_mall_goods_info set stock_num = stock_num-#{stockNumDTO.goodsCount}
             where goods_id = #{stockNumDTO.goodsId} and stock_num>=#{stockNumDTO.goodsCount} and goods_sell_status = 0;
         </foreach>
     </update>
-    <update id="batchUpdateSellStatus">
-        update tb_newbee_mall_goods_info
-        set goods_sell_status=#{sellStatus},update_time=now() where goods_id in
-        <foreach item="id" collection="orderIds" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-    </update>
-
 
     <select id="findNewBeeMallGoodsListBySearch" parameterType="Map" resultMap="BaseResultMap">
         select
@@ -152,23 +172,7 @@
         </foreach>
         );
     </select>
-    <select id="getTotalNewBeeMallGoods" parameterType="Map" resultType="int">
-        select count(*) from tb_newbee_mall_goods_info
-        <where>
-            <if test="goodsName!=null and goodsName!=''">
-                and goods_name like CONCAT('%','#{goodsName}','%')
-            </if>
-            <if test="goodsSellStatus!=null and goodsSellStatus!=''">
-                and goods_sell_status = #{goodsSellStatus}
-            </if>
-            <if test="startTime != null and startTime.trim() != ''">
-                and create_time &gt; #{startTime}
-            </if>
-            <if test="endTime != null and endTime.trim() != ''">
-                and create_time &lt; #{endTime}
-            </if>
-        </where>
-    </select>
+
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from tb_newbee_mall_goods_info
         where goods_id = #{goodsId,jdbcType=BIGINT}
