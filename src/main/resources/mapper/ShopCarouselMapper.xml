@@ -1,7 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ratel.shop.mapper.CarouselMapper">
-    <resultMap id="BaseResultMap" type="com.ratel.shop.entity.Carousel">
+<mapper namespace="com.ratel.shop.mapper.ShopCarouselMapper">
+    <sql id="Base_Column_List">
+        id, carousel_url, redirect_url, carousel_rank, is_deleted, create_time,
+        create_user, update_time, update_user
+     </sql>
+
+    <select id="queryShopCarouselPageList" parameterType="Map" resultType="com.ratel.shop.entity.ShopCarousel">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_shop_carousel
+        WHERE is_deleted = 0
+        ORDER BY carousel_rank DESC
+        <if test="start!=null and limit!=null">
+            limit #{start},#{limit}
+        </if>
+    </select>
+
+    <select id="queryShopCarouselPageCount" parameterType="Map" resultType="int">
+        SELECT COUNT(*) FROM t_shop_carousel
+        WHERE is_deleted = 0
+    </select>
+
+    <resultMap id="BaseResultMap" type="com.ratel.shop.entity.ShopCarousel">
         <id column="carousel_id" jdbcType="INTEGER" property="carouselId"/>
         <result column="carousel_url" jdbcType="VARCHAR" property="carouselUrl"/>
         <result column="redirect_url" jdbcType="VARCHAR" property="redirectUrl"/>
@@ -12,24 +33,8 @@
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="update_user" jdbcType="INTEGER" property="updateUser"/>
     </resultMap>
-    <sql id="Base_Column_List">
-    carousel_id, carousel_url, redirect_url, carousel_rank, is_deleted, create_time, 
-    create_user, update_time, update_user
-  </sql>
-    <select id="findCarouselList" parameterType="Map" resultMap="BaseResultMap">
-        select
-        <include refid="Base_Column_List"/>
-        from tb_newbee_mall_carousel
-        where is_deleted = 0
-        order by carousel_rank desc
-        <if test="start!=null and limit!=null">
-            limit #{start},#{limit}
-        </if>
-    </select>
-    <select id="getTotalCarousels" parameterType="Map" resultType="int">
-        select count(*) from tb_newbee_mall_carousel
-        where is_deleted = 0
-    </select>
+
+
     <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
@@ -48,17 +53,8 @@
     delete from tb_newbee_mall_carousel
     where carousel_id = #{carouselId,jdbcType=INTEGER}
   </delete>
-    <insert id="insert" parameterType="com.ratel.shop.entity.Carousel">
-    insert into tb_newbee_mall_carousel (carousel_id, carousel_url, redirect_url, 
-      carousel_rank, is_deleted, create_time, 
-      create_user, update_time, update_user
-      )
-    values (#{carouselId,jdbcType=INTEGER}, #{carouselUrl,jdbcType=VARCHAR}, #{redirectUrl,jdbcType=VARCHAR}, 
-      #{carouselRank,jdbcType=INTEGER}, #{isDeleted,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{createUser,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=INTEGER}
-      )
-  </insert>
-    <insert id="insertSelective" parameterType="com.ratel.shop.entity.Carousel">
+
+    <insert id="insertSelective" parameterType="com.ratel.shop.entity.ShopCarousel">
         insert into tb_newbee_mall_carousel
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="carouselId != null">
@@ -119,7 +115,7 @@
             </if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.ratel.shop.entity.Carousel">
+    <update id="updateByPrimaryKeySelective" parameterType="com.ratel.shop.entity.ShopCarousel">
         update tb_newbee_mall_carousel
         <set>
             <if test="carouselUrl != null">
@@ -149,7 +145,7 @@
         </set>
         where carousel_id = #{carouselId,jdbcType=INTEGER}
     </update>
-    <update id="updateByPrimaryKey" parameterType="com.ratel.shop.entity.Carousel">
+    <update id="updateByPrimaryKey" parameterType="com.ratel.shop.entity.ShopCarousel">
     update tb_newbee_mall_carousel
     set carousel_url = #{carouselUrl,jdbcType=VARCHAR},
       redirect_url = #{redirectUrl,jdbcType=VARCHAR},

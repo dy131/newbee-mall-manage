@@ -8,16 +8,16 @@
  */
 package com.ratel.shop.service.impl;
 
-import com.ratel.shop.mapper.IndexConfigMapper;
-import com.ratel.shop.util.PageQueryUtil;
-import com.ratel.shop.util.PageResult;
 import com.ratel.shop.common.ServiceResultEnum;
 import com.ratel.shop.entity.IndexConfig;
+import com.ratel.shop.mapper.IndexConfigMapper;
 import com.ratel.shop.service.IndexConfigService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.ratel.shop.util.PageQueryUtil;
+import com.ratel.shop.util.PageResult;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -27,17 +27,16 @@ public class IndexConfigServiceImpl implements IndexConfigService {
     private IndexConfigMapper indexConfigMapper;
 
     @Override
-    public PageResult getConfigsPage(PageQueryUtil pageUtil) {
-        List<IndexConfig> indexConfigs = indexConfigMapper.findIndexConfigList(pageUtil);
-        int total = indexConfigMapper.getTotalIndexConfigs(pageUtil);
-        PageResult pageResult = new PageResult(indexConfigs, total, pageUtil.getLimit(), pageUtil.getPage());
+    public PageResult queryConfigsPageList(PageQueryUtil pageQueryUtil) {
+        List<IndexConfig> indexConfigs = indexConfigMapper.queryIndexConfigPageList(pageQueryUtil);
+        int total = indexConfigMapper.queryIndexConfigPageCount(pageQueryUtil);
+        PageResult pageResult = new PageResult(indexConfigs, total, pageQueryUtil.getLimit(), pageQueryUtil.getPage());
         return pageResult;
     }
 
     @Override
-    public String saveIndexConfig(IndexConfig indexConfig) {
-        //todo 判断是否存在该商品
-        if (indexConfigMapper.insertSelective(indexConfig) > 0) {
+    public String insertIndexConfig(IndexConfig indexConfig) {
+        if (indexConfigMapper.insert(indexConfig) > 0) {
             return ServiceResultEnum.SUCCESS.getResult();
         }
         return ServiceResultEnum.DB_ERROR.getResult();
@@ -45,28 +44,21 @@ public class IndexConfigServiceImpl implements IndexConfigService {
 
     @Override
     public String updateIndexConfig(IndexConfig indexConfig) {
-        //todo 判断是否存在该商品
-        IndexConfig temp = indexConfigMapper.selectByPrimaryKey(indexConfig.getId());
-        if (temp == null) {
+        IndexConfig indexConfig1 = indexConfigMapper.selectById(indexConfig.getId());
+        if (indexConfig1 == null) {
             return ServiceResultEnum.DATA_NOT_EXIST.getResult();
         }
-        if (indexConfigMapper.updateByPrimaryKeySelective(indexConfig) > 0) {
+        if (indexConfigMapper.updateById(indexConfig) > 0) {
             return ServiceResultEnum.SUCCESS.getResult();
         }
         return ServiceResultEnum.DB_ERROR.getResult();
     }
 
     @Override
-    public IndexConfig getIndexConfigById(Long id) {
-        return null;
-    }
-
-    @Override
-    public Boolean deleteBatch(Long[] ids) {
+    public Boolean deleteIndexConfigBatch(Long[] ids) {
         if (ids.length < 1) {
             return false;
         }
-        //删除数据
-        return indexConfigMapper.deleteBatch(ids) > 0;
+        return indexConfigMapper.deleteBatchIds(Arrays.asList(ids)) > 0;
     }
 }

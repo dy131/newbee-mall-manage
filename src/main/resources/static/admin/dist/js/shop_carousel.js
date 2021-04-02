@@ -1,9 +1,9 @@
 $(function () {
     $("#jqGrid").jqGrid({
-        url: '/admin/carousels/list',
+        url: '/carousels/list',
         datatype: "json",
         colModel: [
-            {label: 'id', name: 'carouselId', index: 'carouselId', width: 50, key: true, hidden: true},
+            {label: 'id', name: 'id', index: 'id', width: 50, key: true, hidden: true},
             {label: '轮播图', name: 'carouselUrl', index: 'carouselUrl', width: 180, formatter: coverImageFormatter},
             {label: '跳转链接', name: 'redirectUrl', index: 'redirectUrl', width: 120},
             {label: '排序值', name: 'carouselRank', index: 'carouselRank', width: 120},
@@ -45,7 +45,7 @@ $(function () {
     });
 
     new AjaxUpload('#uploadCarouselImage', {
-        action: '/admin/upload/file',
+        action: '/upload/file',
         name: 'file',
         autoSubmit: true,
         responseType: "json",
@@ -93,12 +93,12 @@ $('#saveButton').click(function () {
         "carouselRank": carouselRank,
         "redirectUrl": redirectUrl
     };
-    var url = '/admin/carousels/save';
+    var url = '/carousels/save';
     var id = getSelectedRowWithoutAlert();
     if (id != null) {
-        url = '/admin/carousels/update';
+        url = '/carousels/update';
         data = {
-            "carouselId": id,
+            "id": id,
             "carouselUrl": carouselUrl,
             "carouselRank": carouselRank,
             "redirectUrl": redirectUrl
@@ -139,7 +139,7 @@ function carouselEdit() {
         return;
     }
     //请求数据
-    $.get("/admin/carousels/info/" + id, function (r) {
+    $.get("/carousels/info/" + id, function (r) {
         if (r.resultCode == 200 && r.data != null) {
             //填充数据至modal
             $("#carouselImg").attr("src", r.data.carouselUrl);
@@ -167,7 +167,7 @@ function deleteCarousel() {
             if (flag) {
                 $.ajax({
                     type: "POST",
-                    url: "/admin/carousels/delete",
+                    url: "/carousels/delete",
                     contentType: "application/json",
                     data: JSON.stringify(ids),
                     success: function (r) {

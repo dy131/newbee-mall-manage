@@ -1,17 +1,19 @@
 package com.ratel.shop.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 @Data
 @Builder
 @TableName("t_index_config")
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class IndexConfig extends BaseEntity {
 
     private String configName;
 
-    private Byte configType;
+    private Integer configType;
 
     private Long goodsId;
 
@@ -19,5 +21,5 @@ public class IndexConfig extends BaseEntity {
 
     private Integer configRank;
 
-    private Byte isDeleted;
+    private Integer isDeleted;
 }

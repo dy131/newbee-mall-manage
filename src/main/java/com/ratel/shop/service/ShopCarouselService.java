@@ -2,17 +2,17 @@ package com.ratel.shop.service;
 
 import com.ratel.shop.util.PageQueryUtil;
 import com.ratel.shop.util.PageResult;
-import com.ratel.shop.entity.Carousel;
+import com.ratel.shop.entity.ShopCarousel;
 
 public interface ShopCarouselService {
 
-    PageResult getCarouselPage(PageQueryUtil pageUtil);
+    PageResult queryShopCarouselPageList(PageQueryUtil pageQueryUtil);
 
-    String saveCarousel(Carousel carousel);
+    String insertCarousel(ShopCarousel carousel);
 
-    String updateCarousel(Carousel carousel);
+    String updateCarousel(ShopCarousel carousel);
 
-    Carousel getCarouselById(Integer id);
+    ShopCarousel queryCarouselById(Long id);
 
-    Boolean deleteBatch(Integer[] ids);
+    Boolean deleteBatchCarouse(Long[] ids);
 }

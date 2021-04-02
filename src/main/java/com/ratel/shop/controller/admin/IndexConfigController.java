@@ -1,5 +1,6 @@
 package com.ratel.shop.controller.admin;
 
+import cn.hutool.core.util.StrUtil;
 import com.ratel.shop.common.IndexConfigTypeEnum;
 import com.ratel.shop.common.ServiceResultEnum;
 import com.ratel.shop.entity.IndexConfig;
@@ -8,7 +9,6 @@ import com.ratel.shop.util.PageQueryUtil;
 import com.ratel.shop.util.Result;
 import com.ratel.shop.util.ResultGenerator;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -17,11 +17,10 @@ import java.util.Map;
 import java.util.Objects;
 
 @Controller
-@RequestMapping("/admin")
 public class IndexConfigController {
 
     @Resource
-    private IndexConfigService newBeeMallIndexConfigService;
+    private IndexConfigService indexConfigService;
 
     @GetMapping("/indexConfigs")
     public String indexConfigsPage(HttpServletRequest request, @RequestParam("configType") int configType) {
@@ -32,34 +31,29 @@ public class IndexConfigController {
 
         request.setAttribute("path", indexConfigTypeEnum.getName());
         request.setAttribute("configType", configType);
-        return "admin/newbee_mall_index_config";
+        return "admin/index_config";
     }
 
-    /**
-     * 列表
-     */
     @RequestMapping(value = "/indexConfigs/list", method = RequestMethod.GET)
     @ResponseBody
     public Result list(@RequestParam Map<String, Object> params) {
-        if (StringUtils.isEmpty(params.get("page")) || StringUtils.isEmpty(params.get("limit"))) {
+        if (params.get("page") == null || params.get("limit") == null) {
             return ResultGenerator.genFailResult("参数异常！");
         }
-        PageQueryUtil pageUtil = new PageQueryUtil(params);
-        return ResultGenerator.genSuccessResult(newBeeMallIndexConfigService.getConfigsPage(pageUtil));
+        PageQueryUtil pageQueryUtil = new PageQueryUtil(params);
+        return ResultGenerator.genSuccessResult(indexConfigService.queryConfigsPageList(pageQueryUtil));
     }
 
-    /**
-     * 添加
-     */
+
     @RequestMapping(value = "/indexConfigs/save", method = RequestMethod.POST)
     @ResponseBody
     public Result save(@RequestBody IndexConfig indexConfig) {
         if (Objects.isNull(indexConfig.getConfigType())
-                || StringUtils.isEmpty(indexConfig.getConfigName())
+                || StrUtil.isBlank(indexConfig.getConfigName())
                 || Objects.isNull(indexConfig.getConfigRank())) {
             return ResultGenerator.genFailResult("参数异常！");
         }
-        String result = newBeeMallIndexConfigService.saveIndexConfig(indexConfig);
+        String result = indexConfigService.insertIndexConfig(indexConfig);
         if (ServiceResultEnum.SUCCESS.getResult().equals(result)) {
             return ResultGenerator.genSuccessResult();
         } else {
@@ -67,20 +61,16 @@ public class IndexConfigController {
         }
     }
 
-
-    /**
-     * 修改
-     */
     @RequestMapping(value = "/indexConfigs/update", method = RequestMethod.POST)
     @ResponseBody
     public Result update(@RequestBody IndexConfig indexConfig) {
         if (Objects.isNull(indexConfig.getConfigType())
                 || Objects.isNull(indexConfig.getId())
-                || StringUtils.isEmpty(indexConfig.getConfigName())
+                || StrUtil.isBlank(indexConfig.getConfigName())
                 || Objects.isNull(indexConfig.getConfigRank())) {
             return ResultGenerator.genFailResult("参数异常！");
         }
-        String result = newBeeMallIndexConfigService.updateIndexConfig(indexConfig);
+        String result = indexConfigService.updateIndexConfig(indexConfig);
         if (ServiceResultEnum.SUCCESS.getResult().equals(result)) {
             return ResultGenerator.genSuccessResult();
         } else {
@@ -88,34 +78,16 @@ public class IndexConfigController {
         }
     }
 
-    /**
-     * 详情
-     */
-    @GetMapping("/indexConfigs/info/{id}")
-    @ResponseBody
-    public Result info(@PathVariable("id") Long id) {
-        IndexConfig config = newBeeMallIndexConfigService.getIndexConfigById(id);
-        if (config == null) {
-            return ResultGenerator.genFailResult("未查询到数据");
-        }
-        return ResultGenerator.genSuccessResult(config);
-    }
-
-    /**
-     * 删除
-     */
     @RequestMapping(value = "/indexConfigs/delete", method = RequestMethod.POST)
     @ResponseBody
     public Result delete(@RequestBody Long[] ids) {
         if (ids.length < 1) {
             return ResultGenerator.genFailResult("参数异常！");
         }
-        if (newBeeMallIndexConfigService.deleteBatch(ids)) {
+        if (indexConfigService.deleteIndexConfigBatch(ids)) {
             return ResultGenerator.genSuccessResult();
         } else {
             return ResultGenerator.genFailResult("删除失败");
         }
     }
-
-
 }

@@ -8,9 +8,12 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface IndexConfigMapper extends BaseMapper<IndexConfig> {
-    int deleteByPrimaryKey(Long configId);
 
-    int insert(IndexConfig record);
+    List<IndexConfig> queryIndexConfigPageList(PageQueryUtil pageQueryUtil);
+
+    int queryIndexConfigPageCount(PageQueryUtil pageQueryUtil);
+
+    int deleteByPrimaryKey(Long configId);
 
     int insertSelective(IndexConfig record);
 
@@ -19,10 +22,6 @@ public interface IndexConfigMapper extends BaseMapper<IndexConfig> {
     int updateByPrimaryKeySelective(IndexConfig record);
 
     int updateByPrimaryKey(IndexConfig record);
-
-    List<IndexConfig> findIndexConfigList(PageQueryUtil pageUtil);
-
-    int getTotalIndexConfigs(PageQueryUtil pageUtil);
 
     int deleteBatch(Long[] ids);
 

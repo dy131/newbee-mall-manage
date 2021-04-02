@@ -1,6 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ratel.shop.mapper.IndexConfigMapper">
+
+    <sql id="Base_Column_List">
+        id, config_name, config_type, goods_id, redirect_url, config_rank, is_deleted,
+        create_time, create_user, update_time, update_user
+     </sql>
+
+    <select id="queryIndexConfigPageList" parameterType="Map" resultType="com.ratel.shop.entity.IndexConfig">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_index_config
+        <where>
+            <if test="configType!=null and configType!=''">
+                AND config_type = #{configType}
+            </if>
+            AND is_deleted = 0
+        </where>
+        ORDER BY config_rank DESC
+        <if test="start!=null and limit!=null">
+            limit #{start},#{limit}
+        </if>
+    </select>
+
+    <select id="queryIndexConfigPageCount" parameterType="Map" resultType="int">
+        SELECT COUNT(*) FROM t_index_config
+        <where>
+            <if test="configType!=null and configType!=''">
+                AND config_type = #{configType}
+            </if>
+            AND is_deleted = 0
+        </where>
+    </select>
+
+
     <resultMap id="BaseResultMap" type="com.ratel.shop.entity.IndexConfig">
         <id column="config_id" jdbcType="BIGINT" property="configId"/>
         <result column="config_name" jdbcType="VARCHAR" property="configName"/>
@@ -14,35 +47,7 @@
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="update_user" jdbcType="INTEGER" property="updateUser"/>
     </resultMap>
-    <sql id="Base_Column_List">
-    config_id, config_name, config_type, goods_id, redirect_url, config_rank, is_deleted, 
-    create_time, create_user, update_time, update_user
-  </sql>
 
-    <select id="findIndexConfigList" parameterType="Map" resultMap="BaseResultMap">
-        select
-        <include refid="Base_Column_List"/>
-        from tb_newbee_mall_index_config
-        <where>
-            <if test="configType!=null and configType!=''">
-                and config_type = #{configType}
-            </if>
-            and is_deleted = 0
-        </where>
-        order by config_rank desc
-        <if test="start!=null and limit!=null">
-            limit #{start},#{limit}
-        </if>
-    </select>
-    <select id="getTotalIndexConfigs" parameterType="Map" resultType="int">
-        select count(*) from tb_newbee_mall_index_config
-        <where>
-            <if test="configType!=null and configType!=''">
-                and config_type = #{configType}
-            </if>
-            and is_deleted = 0
-        </where>
-    </select>
     <select id="findIndexConfigsByTypeAndNum" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
@@ -68,16 +73,7 @@
             #{id}
         </foreach>
     </update>
-    <insert id="insert" parameterType="com.ratel.shop.entity.IndexConfig">
-    insert into tb_newbee_mall_index_config (config_id, config_name, config_type, 
-      goods_id, redirect_url, config_rank, 
-      is_deleted, create_time, create_user, 
-      update_time, update_user)
-    values (#{configId,jdbcType=BIGINT}, #{configName,jdbcType=VARCHAR}, #{configType,jdbcType=TINYINT}, 
-      #{goodsId,jdbcType=BIGINT}, #{redirectUrl,jdbcType=VARCHAR}, #{configRank,jdbcType=INTEGER}, 
-      #{isDeleted,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, #{createUser,jdbcType=INTEGER}, 
-      #{updateTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=INTEGER})
-  </insert>
+
     <insert id="insertSelective" parameterType="com.ratel.shop.entity.IndexConfig">
         insert into tb_newbee_mall_index_config
         <trim prefix="(" suffix=")" suffixOverrides=",">

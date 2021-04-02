@@ -25,23 +25,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserDetailById(Integer loginUserId) {
-        return userMapper.selectByPrimaryKey(loginUserId);
+    public User queryUserById(Long userId) {
+        return userMapper.selectById(userId);
     }
 
     @Override
-    public Boolean updatePassword(Integer loginUserId, String originalPassword, String newPassword) {
-        User adminUser = userMapper.selectByPrimaryKey(loginUserId);
-        //当前用户非空才可以进行更改
-        if (adminUser != null) {
+    public Boolean updatePassword(Long userId, String originalPassword, String newPassword) {
+        User user = userMapper.selectById(userId);
+        if (user != null) {
             String originalPasswordMd5 = MD5Util.MD5Encode(originalPassword, "UTF-8");
             String newPasswordMd5 = MD5Util.MD5Encode(newPassword, "UTF-8");
-            //比较原密码是否正确
-            if (originalPasswordMd5.equals(adminUser.getPassword())) {
-                //设置新密码并修改
-                adminUser.setPassword(newPasswordMd5);
-                if (userMapper.updateByPrimaryKeySelective(adminUser) > 0) {
-                    //修改成功则返回true
+            if (originalPasswordMd5.equals(user.getPassword())) {
+                user.setPassword(newPasswordMd5);
+                if (userMapper.updateById(user) > 0) {
                     return true;
                 }
             }
@@ -50,15 +46,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean updateName(Integer loginUserId, String loginUserName, String nickName) {
-        User adminUser = userMapper.selectByPrimaryKey(loginUserId);
-        //当前用户非空才可以进行更改
-        if (adminUser != null) {
-            //设置新名称并修改
-            adminUser.setUserName(loginUserName);
-            adminUser.setNickName(nickName);
-            if (userMapper.updateByPrimaryKeySelective(adminUser) > 0) {
-                //修改成功则返回true
+    public Boolean updateName(Long userId, String userName, String nickName) {
+        User user = userMapper.selectById(userId);
+        if (user != null) {
+            user.setUserName(userName);
+            user.setNickName(nickName);
+            if (userMapper.updateById(user) > 0) {
                 return true;
             }
         }

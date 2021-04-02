@@ -6,13 +6,11 @@ import com.ratel.shop.entity.IndexConfig;
 
 public interface IndexConfigService {
 
-    PageResult getConfigsPage(PageQueryUtil pageUtil);
+    PageResult queryConfigsPageList(PageQueryUtil pageQueryUtil);
 
-    String saveIndexConfig(IndexConfig indexConfig);
+    String insertIndexConfig(IndexConfig indexConfig);
 
     String updateIndexConfig(IndexConfig indexConfig);
 
-    IndexConfig getIndexConfigById(Long id);
-
-    Boolean deleteBatch(Long[] ids);
+    Boolean deleteIndexConfigBatch(Long[] ids);
 }

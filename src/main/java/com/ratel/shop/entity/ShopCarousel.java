@@ -1,16 +1,18 @@
 package com.ratel.shop.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 /**
  * 轮播
  */
 @Data
 @Builder
-@TableName("t_carousel")
-public class Carousel extends BaseEntity {
+@TableName("t_shop_carousel")
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+public class ShopCarousel extends BaseEntity {
 
     private String carouselUrl;
 

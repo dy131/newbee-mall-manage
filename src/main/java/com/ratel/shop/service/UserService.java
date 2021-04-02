@@ -6,19 +6,10 @@ public interface UserService {
 
     User login(String userName, String password);
 
-    /**
-     * 获取用户信息
-     */
-    User getUserDetailById(Integer loginUserId);
+    User queryUserById(Long userId);
 
-    /**
-     * 修改当前登录用户的密码
-     */
-    Boolean updatePassword(Integer loginUserId, String originalPassword, String newPassword);
+    Boolean updatePassword(Long userId, String originalPassword, String newPassword);
 
-    /**
-     * 修改当前登录用户的名称信息
-     */
-    Boolean updateName(Integer loginUserId, String loginUserName, String nickName);
+    Boolean updateName(Long userId, String loginUserName, String nickName);
 
 }
